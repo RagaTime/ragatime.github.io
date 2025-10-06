@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "description": "RagaTime",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "RagaTime",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "RagaTime",
+  "start_url": "/",
+  "theme_color": "#ffffff"
+}
