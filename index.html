@@ -46,7 +46,7 @@
 
             installBtn.addEventListener('click', async () => {
                 const result = await installPrompt.prompt();
-                alert(result.outcome ? 'Accepted ✅' : 'Rejected ❌');
+                alert(result.outcome === 'accepted' ? 'Accepted ✅' : 'Rejected ❌');
                 console.log(`Install prompt was: ${result.outcome}`);
                 installPrompt = null;
 
