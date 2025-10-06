@@ -18,6 +18,12 @@
     <h1>Welcome to My PWA!</h1>
     <p>This is a minimal Progressive Web App example.</p>
 
+    <div hidden id="modal">
+        <div> Full Screen Install Modal </div>
+        <button id="install-btn-1" style="margin-top: 80px;"> Install App (1) </button>
+    </div>
+    <button hidden id="install-btn-2">Install App (2)</button>
+
     <!-- Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
@@ -31,7 +37,7 @@
             alert('Service Workers are not supported in this browser.');
         }
 
-
+        let isFirstEvent_beforeinstallprompt = true; // Track if it's the first beforeinstallprompt event
         // Prompt for installation
         let installPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -47,22 +53,27 @@
             installBtn.addEventListener('click', async () => {
                 const result = await installPrompt.prompt();
                 alert(result.outcome === 'accepted' ? 'Accepted ✅' : 'Rejected ❌');
-                console.log(`Install prompt was: ${result.outcome}`);
+                console.log(`Install prompt was: ${result.outcome}`); // "accepted" or "dismissed"
                 installPrompt = null;
-
-                // deferredPrompt.prompt(); // Show the install prompt
-                // deferredPrompt.userChoice.then((choiceResult) => {
-                //     if (choiceResult.outcome === 'accepted') {
-                //         alert('User accepted the install ✅');
-                //     } else {
-                //         alert('User dismissed the install ❌');
-                //     }
-                //     deferredPrompt = null;
-                // });
+                isFirstEvent_beforeinstallprompt = false;
             });
         });
 
     </script>
+
+    <style>
+        #modal {
+            text-align: center;
+            border: 1px solid black;
+            border-radius: 5px;
+            width: 200px;
+            height: 200px;
+            padding-top: 30px;
+            font-size: 16px;
+            margin-right: 10px;
+            text-decoration: underline;
+        }
+    </style>
 </body>
 
 </html>
