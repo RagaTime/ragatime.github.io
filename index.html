@@ -33,27 +33,32 @@
 
 
         // Prompt for installation
-        let deferredPrompt;
+        let installPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             // Prevent Chrome from showing the default prompt
             e.preventDefault();
-            deferredPrompt = e;
+            installPrompt = e;
 
             // Optionally, show your own install button
             const installBtn = document.createElement('button');
             installBtn.textContent = "Install App";
             document.body.appendChild(installBtn);
 
-            installBtn.addEventListener('click', () => {
-                deferredPrompt.prompt(); // Show the install prompt
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        alert('User accepted the install ✅');
-                    } else {
-                        alert('User dismissed the install ❌');
-                    }
-                    deferredPrompt = null;
-                });
+            installBtn.addEventListener('click', async () => {
+                const result = await installPrompt.prompt();
+                alert(result.outcome ? 'Accepted ✅' : 'Rejected ❌');
+                console.log(`Install prompt was: ${result.outcome}`);
+                installPrompt = null;
+
+                // deferredPrompt.prompt(); // Show the install prompt
+                // deferredPrompt.userChoice.then((choiceResult) => {
+                //     if (choiceResult.outcome === 'accepted') {
+                //         alert('User accepted the install ✅');
+                //     } else {
+                //         alert('User dismissed the install ❌');
+                //     }
+                //     deferredPrompt = null;
+                // });
             });
         });
 
