@@ -26,6 +26,8 @@
 
     <!-- Service Worker Registration -->
     <script>
+        const $ = document.querySelector.bind(document);
+
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js')
                 .then(() => console.log('Service Worker registered'))
