@@ -51,9 +51,6 @@
                 isFirstEventFire_beforeinstallprompt = false;
                 $("#modal").removeAttribute("hidden");
             }
-            // else {
-            //     $("#install-btn-2").removeAttribute("hidden");
-            // }
         });
 
         $('#install-btn-1').addEventListener('click', handleInstall);
@@ -67,16 +64,17 @@
             }
             const result = await installPrompt.prompt();
             const isAccepted = result.outcome === 'accepted';
+            installPromptRef.current = null;
             alert(isAccepted ? 'Accepted ✅' : 'Rejected ❌');
             console.log(`Install prompt was: ${result.outcome}`); // "accepted" or "dismissed"
 
-            installPromptRef.current = null;
-
             $("#modal").setAttribute("hidden", true); // Hide modal if accepted
             if (isAccepted) {
-                $("#install-btn-2").setAttribute("hidden", true); // Hide `install-btn-2` if accepted
+                // Hide `install-btn-2` if accepted
+                $("#install-btn-2").setAttribute("hidden", true);
             } else {
-                $("#install-btn-2").removeAttribute("hidden"); // Show `install-btn-2` if rejected
+                // Show `install-btn-2` if rejected
+                $("#install-btn-2").removeAttribute("hidden");
             }
         }
     </script>
