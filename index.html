@@ -22,14 +22,41 @@
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js')
-                .then(() => alert('Service Worker registered'))
+                .then(() => console.log('Service Worker registered'))
                 .catch(err => {
-                    alert('Service Worker registration failed: ' + err.toString());
+                    // console.log('Service Worker registration failed: ' + err.toString());
                     console.log('Service Worker registration failed:', err);
                 });
         } else {
             alert('Service Workers are not supported in this browser.');
         }
+
+
+        // Prompt for installation
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome from showing the default prompt
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Optionally, show your own install button
+            const installBtn = document.createElement('button');
+            installBtn.textContent = "Install App";
+            document.body.appendChild(installBtn);
+
+            installBtn.addEventListener('click', () => {
+                deferredPrompt.prompt(); // Show the install prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        alert('User accepted the install ✅');
+                    } else {
+                        alert('User dismissed the install ❌');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+        });
+
     </script>
 </body>
 
