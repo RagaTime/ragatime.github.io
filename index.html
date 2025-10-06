@@ -45,10 +45,11 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault(); // Prevent Chrome from showing the default prompt
             installPromptRef.current = e;
-            // if (isFirstEventFire_beforeinstallprompt) {
-            //     isFirstEventFire_beforeinstallprompt = false;
-            //     $("#modal").removeAttribute("hidden");
-            // } else {
+            if (isFirstEventFire_beforeinstallprompt) {
+                isFirstEventFire_beforeinstallprompt = false;
+                $("#modal").removeAttribute("hidden");
+            }
+            // else {
             //     $("#install-btn-2").removeAttribute("hidden");
             // }
         });
