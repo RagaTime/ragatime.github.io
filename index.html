@@ -11,7 +11,7 @@
     <meta name="theme-color" content="#000000">
 
     <!-- Optional favicon -->
-    <!-- <link rel="icon" href="/icon-192.png" sizes="192x192"> -->
+    <link rel="icon" href="/manifest-assets/icon-192.png" sizes="192x192">
 </head>
 
 <body>
@@ -27,6 +27,8 @@
                     alert('Service Worker registration failed: ' + err.toString());
                     console.log('Service Worker registration failed:', err);
                 });
+        } else {
+            alert('Service Workers are not supported in this browser.');
         }
     </script>
 </body>
