@@ -41,45 +41,41 @@
         let isFirstEventFire_beforeinstallprompt = true;
 
         // Prompt for installation
-        let installPromptRef = { ref: null };
+        let installPromptRef = { current: null };
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault(); // Prevent Chrome from showing the default prompt
-            installPromptRef.ref = e;
-            if (isFirstEventFire_beforeinstallprompt) {
-                isFirstEventFire_beforeinstallprompt = false;
-                $("#modal").removeAttribute("hidden");
-            } else {
-                $("#install-btn-2").removeAttribute("hidden");
-            }
+            installPromptRef.current = e;
+            // if (isFirstEventFire_beforeinstallprompt) {
+            //     isFirstEventFire_beforeinstallprompt = false;
+            //     $("#modal").removeAttribute("hidden");
+            // } else {
+            //     $("#install-btn-2").removeAttribute("hidden");
+            // }
         });
-        const handleInstall = async () => {
-            const installPrompt = installPromptRef.ref;
+
+        $('#install-btn-1').addEventListener('click', handleInstall);
+        $('#install-btn-2').addEventListener('click', handleInstall);
+
+        async function handleInstall() {
+            const installPrompt = installPromptRef.current;
             if (!installPrompt) {
                 alert("Install prompt not available");
                 return;
             }
             const result = await installPrompt.prompt();
-            alert(result.outcome === 'accepted' ? 'Accepted ✅' : 'Rejected ❌');
+            const isAccepted = result.outcome === 'accepted';
+            alert(isAccepted ? 'Accepted ✅' : 'Rejected ❌');
             console.log(`Install prompt was: ${result.outcome}`); // "accepted" or "dismissed"
-            installPromptRef.ref = null;
 
-            if (result.outcome === 'accepted') {
-                // Hide everything if accepted
-                $("#modal").setAttribute("hidden", true); // Hide modal if accepted
+            installPromptRef.current = null;
+
+            $("#modal").setAttribute("hidden", true); // Hide modal if accepted
+            if (isAccepted) {
                 $("#install-btn-2").setAttribute("hidden", true); // Hide `install-btn-2` if accepted
             } else {
-                $("#modal").setAttribute("hidden", true); // Hide modal if rejected
                 $("#install-btn-2").removeAttribute("hidden"); // Show `install-btn-2` if rejected
             }
-
-            if (isFirstEventFire_beforeinstallprompt) {
-                isFirstEventFire_beforeinstallprompt = false;
-            }
-        };
-
-        $('#install-btn-1').addEventListener('click', handleInstall);
-        $('#install-btn-2').addEventListener('click', handleInstall);
-
+        }
     </script>
 
     <style>
