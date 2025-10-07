@@ -24,9 +24,9 @@
         <!-- <div> Full Screen Install Modal </div> -->
         <h1 style="margin: 20px;"> Install RagaTime App and enjoy: </h1>
         <div style="margin-left: 28px;">
-            <li> 🎶 Offline access to your favorite ragas </li>
             <li> ⚡ Faster, smoother playback </li>
             <li> 📱 One-tap launch from your home screen </li>
+            <li> 🎶 Offline access to your favorite ragas </li>
         </div>
         <div style="margin-top: 20px; margin-left: 20px;">
             No app store needed — it’s lightweight and secure.
@@ -38,7 +38,17 @@
         </div>
     </div>
 
+    <!-- Button on top-right corner -->
     <button hidden id="install-btn-2">Install App</button>
+
+    <!-- <div class="audio-label">Raga - Des, Hariprasad Chaurasia, Album - Krishnadhwani Music Today</div> -->
+    <div class="audio-label">Healing Ragas || Rag Hamsadwani - Sitar Flute and Violin || Classical Fusion Music</div>
+    <audio controls>
+        <source
+            src="https://github.com/RagaTime/ragatime-files/raw/refs/heads/main/2-Healing-Ragas-Rag-Hamsadwani-Sitar-Flute-and-Violin-Classical-Fusion-Music.mp3"
+            type="audio/mp3" />
+        Your browser does not support the audio element.
+    </audio>
 
     <!-- Service Worker Registration -->
     <script>
@@ -108,6 +118,7 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
+            z-index: 10;
 
             margin: auto;
             text-align: left;
@@ -145,6 +156,19 @@
 
         button {
             border-radius: 10px;
+        }
+
+        .audio-label {
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 2px;
+            font-weight: bold;
+        }
+
+        audio {
+            position: relative;
+            display: block;
+            margin: auto;
         }
     </style>
 </body>
