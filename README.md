@@ -5,9 +5,12 @@
 - Make website with apk installation for classical music sharing for people
 - Check if you can manage the playing all the files in a loop from urls?
 
-## Notes
+# Notes
 
-_Inspiration: [Click here](https://chatgpt.com/c/68e3ec14-cd48-832e-b764-b520e2302b27)_
+_Inspiration:_
+
+- [1](https://chatgpt.com/c/68e3ec14-cd48-832e-b764-b520e2302b27)
+- [2](https://chatgpt.com/c/68e0c2aa-0718-8321-a4ad-c23eff814151)
 
 - MDN Docs: [Clickh here](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeinstallprompt_event)
 
