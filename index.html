@@ -19,10 +19,24 @@
     <p style="text-align: center;">This is a minimal Progressive Web App example.</p>
 
     <div hidden id="modal">
-        <div> Full Screen Install Modal </div>
-        <button id="install-btn-1" style="margin-top: 80px;"> Install App (1) </button>
+        <!-- <div> Full Screen Install Modal </div> -->
+        <h1 style="margin: 20px;"> Install RagaTime App and enjoy: </h1>
+        <div style="margin-left: 28px;">
+            <li> 🎶 Offline access to your favorite ragas </li>
+            <li> ⚡ Faster, smoother playback </li>
+            <li> 📱 One-tap launch from your home screen </li>
+        </div>
+        <div style="margin-top: 20px; margin-left: 20px;">
+            No app store needed — it’s lightweight and secure.
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 30px;">
+            <button id="install-btn-1"> Install Now </button>
+            <button id="maybe-later-btn"> Maybe Later
+            </button>
+        </div>
     </div>
-    <button hidden id="install-btn-2">Install App (2)</button>
+
+    <button hidden id="install-btn-2">Install App</button>
 
     <!-- Service Worker Registration -->
     <script>
@@ -57,6 +71,10 @@
 
         $('#install-btn-1').addEventListener('click', handleInstall);
         $('#install-btn-2').addEventListener('click', handleInstall);
+        $('#maybe-later-btn').addEventListener('click', () => {
+            $("#modal").setAttribute("hidden", true);
+            $("#install-btn-2").removeAttribute("hidden");
+        });
 
         async function handleInstall() {
             const installPrompt = installPromptRef.current;
@@ -84,15 +102,47 @@
 
     <style>
         #modal {
-            text-align: center;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+
+            margin: auto;
+            text-align: left;
             border: 1px solid black;
             border-radius: 5px;
-            width: 200px;
-            height: 200px;
+            width: 80vw;
+            height: 60vh;
             padding-top: 30px;
             font-size: 16px;
-            margin-right: 10px;
-            text-decoration: underline;
+            background: lightyellow;
+        }
+
+        /* Button on modal */
+        #install-btn-1 {
+            background: lightcoral;
+            padding: 15px;
+            font-weight: bold;
+        }
+
+        #maybe-later-btn {
+            background: lightgray;
+            padding: 15px;
+            font-weight: bold;
+            margin-left: 20px;
+        }
+
+        /* Button on top-rigth corner */
+        #install-btn-2 {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            padding: 10px;
+            font-weight: bold;
+        }
+
+        button {
+            border-radius: 10px;
         }
     </style>
 </body>
