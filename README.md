@@ -9,10 +9,10 @@
 
 _Inspiration:_
 
-- [1](https://chatgpt.com/c/68e3ec14-cd48-832e-b764-b520e2302b27)
-- [2](https://chatgpt.com/c/68e0c2aa-0718-8321-a4ad-c23eff814151)
-- [3](https://chatgpt.com/c/68e4c57c-376c-8322-89e5-3e2412862d53)
-
+- ChatGPT:
+  - [1](https://chatgpt.com/c/68e3ec14-cd48-832e-b764-b520e2302b27)
+  - [2](https://chatgpt.com/c/68e0c2aa-0718-8321-a4ad-c23eff814151)
+  - [3](https://chatgpt.com/c/68e4c57c-376c-8322-89e5-3e2412862d53)
 - MDN Docs: [Clickh here](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeinstallprompt_event)
 
 1. I have disabled jekyll by adding `.nojekll` because I don’t want GitHub Pages to process your site with Jekyll.
