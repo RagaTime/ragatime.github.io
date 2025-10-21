@@ -61,8 +61,8 @@ async function handleInstall() {
 }
 
 const audioEl = $("#player");
-// TODO: Load list of audio urls dynamically via the list of files
-//      fetched via API.
+// TODO: Load file names from API /api/v1/public-files/* and prefix
+//      url https://file.mypot.in/folderName/fileName.mp3 and play them.
 let audioUrls = [
     "http://192.168.18.2:8080/.ignored/1.mp3",
     "http://192.168.18.2:8080/.ignored/2.mp3",
