@@ -43,12 +43,7 @@
     <div class="audio-label">Healing Ragas || Rag Hamsadwani - Sitar Flute and Violin || Classical Fusion Music</div>
 
     <!-- <div class="audio-label">Raga - Des, Hariprasad Chaurasia, Album - Krishnadhwani Music Today</div> -->
-    <audio controls>
-        <source
-            src="https://github.com/RagaTime/ragatime-files/raw/refs/heads/main/2-Healing-Ragas-Rag-Hamsadwani-Sitar-Flute-and-Violin-Classical-Fusion-Music.mp3"
-            type="audio/mp3" />
-        Your browser does not support the audio element.
-    </audio>
+    <audio id="player" controls></audio>
 
     <!-- Service Worker Registration -->
     <script>
@@ -110,6 +105,31 @@
                 $("#install-btn-2").removeAttribute("hidden");
             }
         }
+
+        const audioEl = $("#player");
+        let audioUrls = [
+            "http://192.168.18.2:8080/.ignored/1.mp3",
+            "http://192.168.18.2:8080/.ignored/2.mp3",
+        ];
+
+        function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function playRandomAudio() {
+            let randomEl = getRandomElement(audioUrls);
+            if (randomEl) {
+                audioUrls = audioUrls.filter(item => item !== randomEl); // remove randomEl array
+                audioEl.src = randomEl;
+                audioEl.play();
+            } else {
+                alert('Playback finished for all audios!');
+            }
+        }
+        playRandomAudio();
+        // For initial testing => // audioEl.src = "https://github.com/RagaTime/ragatime-files/raw/refs/heads/main/2-Healing-Ragas-Rag-Hamsadwani-Sitar-Flute-and-Violin-Classical-Fusion-Music.mp3";
+        // Learn: Event "ended" fires once when playback reaches the end naturally (not if stopped manually). (src: https://chatgpt.com/c/68f76f5d-9110-8324-85f0-a4b5d6c16617)
+        audioEl.addEventListener("ended", () => {
+            console.log("Playback finished!");
+            playRandomAudio();
+        });
     </script>
 
     <style>
