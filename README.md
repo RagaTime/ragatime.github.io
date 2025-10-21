@@ -18,3 +18,8 @@ _Inspiration:_
 1. I have disabled jekyll by adding `.nojekll` because I don’t want GitHub Pages to process your site with Jekyll.
 2. Icons are necessary otherwise you click on `Add to homescreen` button you won't see the `Install` button rather you'll see a "Editable App" name field with "Add" button which looks pathetic.
 3. I made two icons with 192x192 and 512x512 size usin figma.
+
+# Google Docs
+
+- Make it installable: [Click here](https://web.dev/articles/codelab-make-installable)
+- Native App Install Prompt: [Click here](https://developer.chrome.com/blog/app-install-banners-native)
