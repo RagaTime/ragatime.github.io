@@ -23,6 +23,11 @@ let isFirstEventFire_beforeinstallprompt = true;
 let installPromptRef = { current: null };
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault(); // Prevent Chrome from showing the default prompt
+    // Learn: Below line throws - Uncaught (in promise)
+    //      NotAllowedError: Failed to execute 'prompt' on
+    //      'BeforeInstallPromptEvent': The prompt() method must be called
+    //      with a user gesture
+    // const result = await e.prompt();
     installPromptRef.current = e;
     if (isFirstEventFire_beforeinstallprompt) {
         isFirstEventFire_beforeinstallprompt = false;
