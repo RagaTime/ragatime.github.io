@@ -75,6 +75,10 @@ let audioUrls = [];
 function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function playRandomAudio(play = true) {
     let randomEl = getRandomElement(audioUrls);
+    const encodedFileName = randomEl.match(/[^/]+$/)[0];
+    const decodedFileName = decodeURIComponent(encodedFileName);
+    console.log(decodedFileName); // encodedFileName
+    $("#filename").innerText = decodedFileName;
     if (randomEl) {
         audioUrls = audioUrls.filter(item => item !== randomEl); // remove randomEl array
         audioEl.src = randomEl;
