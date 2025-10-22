@@ -85,7 +85,8 @@ function playRandomAudio(play = true) {
 }
 
 async function fetchAudioFiles() {
-    const folderName = 'western-mp3';
+    // const folderName = 'western-mp3';
+    const folderName = 'indian-mp3';
     // const res = await axios.get(`https://api-dev.mypot.in/api/v1/public-files/${folderName}`);
     const res = await axios.get(`https://api.mypot.in/api/v1/public-files/${folderName}`);
     const fileNames = res.data;
