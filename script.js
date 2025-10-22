@@ -65,13 +65,12 @@ async function handleInstall() {
     }
 }
 
-const audioEl = $("#player");
-// TODO: Load file names from API /api/v1/public-files/* and prefix
-//      url https://file.mypot.in/folderName/fileName.mp3 and play them.
-let audioUrls = [
-    "http://192.168.18.2:8080/.ignored/1.mp3",
-    "http://192.168.18.2:8080/.ignored/2.mp3",
-];
+let audioUrls = [];
+// let audioUrls = [ // For local testing
+//     "http://192.168.18.2:8080/.ignored/1.mp3",
+//     "http://192.168.18.2:8080/.ignored/2.mp3",
+// ];
+// playRandomAudio(false); // For local testing
 
 function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function playRandomAudio(play = true) {
@@ -84,7 +83,25 @@ function playRandomAudio(play = true) {
         alert('Playback finished for all audios!');
     }
 }
-playRandomAudio(false); // we can't simply play files before user interact with the webpage and we get error in console and link to this - https://goo.gl/xX8pDD
+
+async function fetchAudioFiles() {
+    const folderName = 'western-mp3';
+    // const res = await axios.get(`https://api-dev.mypot.in/api/v1/public-files/${folderName}`);
+    const res = await axios.get(`https://api.mypot.in/api/v1/public-files/${folderName}`);
+    const fileNames = res.data;
+    audioUrls = res.data.map(fileName => { const encodedFileName = encodeURIComponent(fileName); return `https://files.mypot.in/${folderName}/${encodedFileName}`; });
+    // console.log("🚀 ~ audioUrls:", audioUrls);
+    // Note: We can't simply play files before user interact with the
+    //      webpage and we get error in console and link to this -
+    //      https://goo.gl/xX8pDD.
+    //      Though we must set the audio file thus using below statement
+    //      to set the first audio file.
+    playRandomAudio(false);
+}
+fetchAudioFiles();
+
+const audioEl = $("#player");
+
 // For initial testing => // audioEl.src = "https://github.com/RagaTime/ragatime-files/raw/refs/heads/main/2-Healing-Ragas-Rag-Hamsadwani-Sitar-Flute-and-Violin-Classical-Fusion-Music.mp3";
 // Learn: Event "ended" fires once when playback reaches the end naturally (not if stopped manually). (src: https://chatgpt.com/c/68f76f5d-9110-8324-85f0-a4b5d6c16617)
 audioEl.addEventListener("ended", () => {
