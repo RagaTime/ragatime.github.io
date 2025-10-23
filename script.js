@@ -66,14 +66,16 @@ async function handleInstall() {
 }
 
 let audioUrls = [];
+let audioUrlsCopy = [];
 // let audioUrls = [ // For local testing
 //     "http://192.168.18.2:8080/.ignored/1.mp3",
 //     "http://192.168.18.2:8080/.ignored/2.mp3",
 // ];
 // playRandomAudio(false); // For local testing
+// For initial testing => // audioEl.src = "https://github.com/RagaTime/ragatime-files/raw/refs/heads/main/2-Healing-Ragas-Rag-Hamsadwani-Sitar-Flute-and-Violin-Classical-Fusion-Music.mp3";
 
 function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function playRandomAudio(play = true) {
+async function playRandomAudio(play = true) {
     let randomEl = getRandomElement(audioUrls);
     // let randomEl = audioUrls.find(url => url.includes('Rag%20Hamsadwani')); // for debugging - for playing specific audio file
     if (randomEl) {
@@ -89,6 +91,10 @@ function playRandomAudio(play = true) {
         if (play) audioEl.play();
     } else {
         alert('Playback finished for all audios!');
+        // Restart playlist when playlist finishes.
+        audioUrls = [...audioUrlsCopy];
+        // we want to acutally play the audio after fetching this time.
+        playRandomAudio(true);
     }
 }
 $('#next-audio').addEventListener('click', playRandomAudio);
@@ -100,6 +106,7 @@ async function fetchAudioFiles() {
     const res = await axios.get(`https://api.mypot.in/api/v1/public-files/${folderName}`);
     const fileNames = res.data;
     audioUrls = res.data.map(fileName => { const encodedFileName = encodeURIComponent(fileName); return `https://files.mypot.in/${folderName}/${encodedFileName}`; });
+    audioUrlsCopy = [...audioUrls];
     // console.log("🚀 ~ audioUrls:", audioUrls);
     // Note: We can't simply play files before user interact with the
     //      webpage and we get error in console and link to this -
@@ -111,8 +118,6 @@ async function fetchAudioFiles() {
 fetchAudioFiles();
 
 const audioEl = $("#player");
-
-// For initial testing => // audioEl.src = "https://github.com/RagaTime/ragatime-files/raw/refs/heads/main/2-Healing-Ragas-Rag-Hamsadwani-Sitar-Flute-and-Violin-Classical-Fusion-Music.mp3";
 // Learn: Event "ended" fires once when playback reaches the end naturally (not if stopped manually). (src: https://chatgpt.com/c/68f76f5d-9110-8324-85f0-a4b5d6c16617)
 audioEl.addEventListener("ended", () => {
     console.log("Playback finished!");
