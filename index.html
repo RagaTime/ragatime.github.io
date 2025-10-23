@@ -53,13 +53,19 @@
     <!-- <div class="audio-label">Raga - Des, Hariprasad Chaurasia, Album - Krishnadhwani Music Today</div> -->
     <audio id="player" controls></audio>
 
-    <div id="filename" style="text-align: center; margin-top: 20px;">sample-file.mp3</div>
+    <!-- Giving it fixed height so when text takes two lines the height is enough (otheriwse we get a jerk on the buttons below this label) -->
+    <div id="filename" style="height: 56px; text-align: center; margin-top: 20px;">sample-file.mp3</div>
 
-    <div style="display: flex; justify-content: center; margin-top: 30px;">
-        <button onclick="location.reload()">Reload Page</button>
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 30px;">
+        <button id="next-audio">Next</button>
+        <button style="margin-top: 20px;" onclick="location.reload()">Reload Page</button>
     </div>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         #modal {
             position: absolute;
             left: 50%;

@@ -76,11 +76,13 @@ function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.lengt
 function playRandomAudio(play = true) {
     let randomEl = getRandomElement(audioUrls);
     // let randomEl = audioUrls.find(url => url.includes('Rag%20Hamsadwani')); // for debugging - for playing specific audio file
-    const encodedFileName = randomEl.match(/[^/]+$/)[0];
-    const decodedFileName = decodeURIComponent(encodedFileName);
-    console.log("🚀 ~ decodedFileName:", decodedFileName);
-    $("#filename").innerText = decodedFileName;
     if (randomEl) {
+        // Show name of the audio file
+        const encodedFileName = randomEl.match(/[^/]+$/)[0];
+        const decodedFileName = decodeURIComponent(encodedFileName);
+        console.log("🚀 ~ decodedFileName:", decodedFileName);
+        $("#filename").innerText = decodedFileName;
+        // Set to audio player
         audioUrls = audioUrls.filter(item => item !== randomEl); // remove randomEl array
         audioEl.src = randomEl;
         console.log("🚀 ~ randomEl:", randomEl);
@@ -89,6 +91,7 @@ function playRandomAudio(play = true) {
         alert('Playback finished for all audios!');
     }
 }
+$('#next-audio').addEventListener('click', playRandomAudio);
 
 async function fetchAudioFiles() {
     // const folderName = 'western-mp3';
