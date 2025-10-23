@@ -123,3 +123,13 @@ audioEl.addEventListener("ended", () => {
     console.log("Playback finished!");
     playRandomAudio();
 });
+
+
+// Playlist switch logic
+const handleRadio = (e) => {
+    // console.log("🚀 ~ e:", e);
+    const { id, checked } = e.target;
+    console.log('radio changed:', id, checked);
+};
+$('#indian-input').addEventListener('change', handleRadio);
+$('#western-input').addEventListener('change', handleRadio);
