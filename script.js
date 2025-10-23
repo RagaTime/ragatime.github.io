@@ -66,8 +66,8 @@ async function handleInstall() {
 }
 
 let audioUrls = [];
-let audioUrlsCopy = [];
-// let audioUrls = [ // For local testing
+let currentlyPlayingAudioUrls = [];
+// let currentlyPlayingAudioUrls = [ // For local testing
 //     "http://192.168.18.2:8080/.ignored/1.mp3",
 //     "http://192.168.18.2:8080/.ignored/2.mp3",
 // ];
@@ -76,7 +76,7 @@ let audioUrlsCopy = [];
 
 function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 async function playRandomAudio(play = true) {
-    let randomEl = getRandomElement(audioUrls);
+    let randomEl = getRandomElement(currentlyPlayingAudioUrls);
     // let randomEl = audioUrls.find(url => url.includes('Rag%20Hamsadwani')); // for debugging - for playing specific audio file
     if (randomEl) {
         // Show name of the audio file
@@ -85,14 +85,14 @@ async function playRandomAudio(play = true) {
         console.log("🚀 ~ decodedFileName:", decodedFileName);
         $("#filename").innerText = decodedFileName;
         // Set to audio player
-        audioUrls = audioUrls.filter(item => item !== randomEl); // remove randomEl array
+        currentlyPlayingAudioUrls = currentlyPlayingAudioUrls.filter(item => item !== randomEl); // remove randomEl array
         audioEl.src = randomEl;
         console.log("🚀 ~ randomEl:", randomEl);
         if (play) audioEl.play();
     } else {
         alert('Playback finished for all audios!');
         // Restart playlist when playlist finishes.
-        audioUrls = [...audioUrlsCopy];
+        currentlyPlayingAudioUrls = [...audioUrls];
         // we want to acutally play the audio after fetching this time.
         playRandomAudio(true);
     }
@@ -106,7 +106,7 @@ async function fetchAudioFiles() {
     const res = await axios.get(`https://api.mypot.in/api/v1/public-files/${folderName}`);
     const fileNames = res.data;
     audioUrls = res.data.map(fileName => { const encodedFileName = encodeURIComponent(fileName); return `https://files.mypot.in/${folderName}/${encodedFileName}`; });
-    audioUrlsCopy = [...audioUrls];
+    currentlyPlayingAudioUrls = [...audioUrls];
     // console.log("🚀 ~ audioUrls:", audioUrls);
     // Note: We can't simply play files before user interact with the
     //      webpage and we get error in console and link to this -
