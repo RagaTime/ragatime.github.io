@@ -71,11 +71,12 @@ let currentlyPlayingAudioUrls = [];
 //     "http://192.168.18.2:8080/.ignored/1.mp3",
 //     "http://192.168.18.2:8080/.ignored/2.mp3",
 // ];
-// playRandomAudio(false); // For local testing
+// setRandomAudioAndPlay(false); // For local testing
 // For initial testing => // audioEl.src = "https://github.com/RagaTime/ragatime-files/raw/refs/heads/main/2-Healing-Ragas-Rag-Hamsadwani-Sitar-Flute-and-Violin-Classical-Fusion-Music.mp3";
 
 function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-async function playRandomAudio(play = true) {
+
+async function setRandomAudioAndPlay(play = true) {
     let randomEl = getRandomElement(currentlyPlayingAudioUrls);
     // let randomEl = audioUrls.find(url => url.includes('Rag%20Hamsadwani')); // for debugging - for playing specific audio file
     if (randomEl) {
@@ -94,14 +95,16 @@ async function playRandomAudio(play = true) {
         // Restart playlist when playlist finishes.
         currentlyPlayingAudioUrls = [...audioUrls];
         // we want to acutally play the audio after fetching this time.
-        playRandomAudio(true);
+        setRandomAudioAndPlay(true);
     }
 }
-$('#next-audio').addEventListener('click', playRandomAudio);
+$('#next-audio').addEventListener('click', setRandomAudioAndPlay);
 
-async function fetchAudioFiles() {
-    // const folderName = 'western-mp3';
-    const folderName = 'indian-mp3';
+const INDIAN_FOLDER_NAME = 'indian-mp3';
+const WESTERN_FOLDER_NAME = 'western-mp3';
+
+let folderName = INDIAN_FOLDER_NAME;
+async function fetchAudioFiles(play = true) {
     const res = await axios.get(`https://api.mypot.in/api/v1/public-files/${folderName}`);
     // const res = await axios.get(`https://api-dev.mypot.in/api/v1/public-files/${folderName}`);
     // const res = await axios.get(`http://localhost:8080/api/v1/public-files/${folderName}`);
@@ -109,28 +112,36 @@ async function fetchAudioFiles() {
     audioUrls = res.data.map(fileName => { const encodedFileName = encodeURIComponent(fileName); return `https://files.mypot.in/${folderName}/${encodedFileName}`; });
     currentlyPlayingAudioUrls = [...audioUrls];
     // console.log("🚀 ~ audioUrls:", audioUrls);
-    // Note: We can't simply play files before user interact with the
-    //      webpage and we get error in console and link to this -
-    //      https://goo.gl/xX8pDD.
-    //      Though we must set the audio file thus using below statement
-    //      to set the first audio file.
-    playRandomAudio(false);
+    setRandomAudioAndPlay(play);
 }
-fetchAudioFiles();
+// Note: We can't simply play files before user interact with the
+//      webpage and we get error in console and link to this -
+//      https://goo.gl/xX8pDD.
+//      Though we must set the audio file thus using below statement
+//      to set the first audio file.
+fetchAudioFiles(false);
 
 const audioEl = $("#player");
 // Learn: Event "ended" fires once when playback reaches the end naturally (not if stopped manually). (src: https://chatgpt.com/c/68f76f5d-9110-8324-85f0-a4b5d6c16617)
 audioEl.addEventListener("ended", () => {
     console.log("Playback finished!");
-    playRandomAudio();
+    setRandomAudioAndPlay();
 });
 
 
 // Playlist switch logic
-const handleRadio = (e) => {
+const handleRadio = async (e) => {
     // console.log("🚀 ~ e:", e);
     const { id, checked } = e.target;
-    console.log('radio changed:', id, checked);
+    // console.log('radio changed:', id, checked);
+    // Learn: `checked` is always `true`
+    if (id === 'indian-input') {
+        folderName = INDIAN_FOLDER_NAME;
+    }
+    if (id === 'western-input') {
+        folderName = WESTERN_FOLDER_NAME;
+    }
+    await fetchAudioFiles();
 };
 $('#indian-input').addEventListener('change', handleRadio);
 $('#western-input').addEventListener('change', handleRadio);
