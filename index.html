@@ -22,7 +22,7 @@
 
 <body>
     <h1 style="text-align: center;">RagaTime</h1>
-    <p style="text-align: center;">
+    <p style="text-align: center; color: gray; font-style: italic;">
         🌸 From Raaga to Rhythm — Indian Soul, Western Harmony 🎶
     </p>
 
@@ -46,15 +46,13 @@
     <!-- Button on top-right corner -->
     <button hidden id="install-btn-2">Install App</button>
 
-    <!-- <div class="audio-label">Healing Ragas || Rag Hamsadwani - Sitar Flute and Violin || Classical Fusion Music</div> -->
-    <!-- <div class="audio-label">Western Classical Music 🧗</div> -->
-    <div class="audio-label">Indian Classical Music 🪷</div>
-
-    <input type="radio" name="playlist-input" id="indian-input" checked />
-    <label for="indian-input">Indian Classical Music</label>
-    <br />
-    <input type="radio" name="playlist-input" id="western-input" />
-    <label for="western-input">Western Classical Music</label>
+    <div style="text-align: center; margin-top: 20px; font-weight: bold; margin-bottom: 10px;">
+        <input type="radio" name="playlist-input" id="indian-input" checked />
+        <label for="indian-input">Indian Classical Music 🪷</label>
+        <br />
+        <input type="radio" name="playlist-input" id="western-input" />
+        <label for="western-input">Western Classical Music 🧗</label>
+    </div>
 
     <!-- <div class="audio-label">Raga - Des, Hariprasad Chaurasia, Album - Krishnadhwani Music Today</div> -->
     <audio id="player" controls></audio>
