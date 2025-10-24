@@ -102,8 +102,9 @@ $('#next-audio').addEventListener('click', playRandomAudio);
 async function fetchAudioFiles() {
     // const folderName = 'western-mp3';
     const folderName = 'indian-mp3';
-    // const res = await axios.get(`https://api-dev.mypot.in/api/v1/public-files/${folderName}`);
     const res = await axios.get(`https://api.mypot.in/api/v1/public-files/${folderName}`);
+    // const res = await axios.get(`https://api-dev.mypot.in/api/v1/public-files/${folderName}`);
+    // const res = await axios.get(`http://localhost:8080/api/v1/public-files/${folderName}`);
     const fileNames = res.data;
     audioUrls = res.data.map(fileName => { const encodedFileName = encodeURIComponent(fileName); return `https://files.mypot.in/${folderName}/${encodedFileName}`; });
     currentlyPlayingAudioUrls = [...audioUrls];
