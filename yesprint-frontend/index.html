@@ -21,6 +21,34 @@
 </head>
 
 <body>
+    <script>
+        const goToApp = () => {
+            // Replace current page (no back)
+            window.location.replace("https://mypot.in/yesprint-chats");
+        };
+
+        function runOnPageLoad() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('deleteApp') === 'true') {
+                localStorage.setItem('isAppSetup', '');
+            } else {
+                const isAppSetup = localStorage.getItem('isAppSetup');
+                if (isAppSetup) {
+                    goToApp();
+                }
+            }
+        }
+        runOnPageLoad();
+
+        // To debug `runOnPageLoad()` we can run it after 3_000.
+        // setTimeout(runOnPageLoad, 3_000);
+
+        function setupApp() {
+            localStorage.setItem('isAppSetup', true);
+            goToApp();
+        }
+    </script>
+
     <h1 style="text-align: center;">YES Print</h1>
     <p style="text-align: center; color: gray; font-style: italic;">
         ALWAYS YES
@@ -42,6 +70,9 @@
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 30px;">
         <button style="margin-top: 20px; padding: 5px 10px; background: transparent;" onclick="location.reload()">Reload
             Page</button>
+
+        <button style="margin-top: 20px; padding: 5px 10px; background: transparent;" onclick="setupApp()">Setup
+            App</button>
     </div>
 
     <style>
