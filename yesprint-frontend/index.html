@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YES Print</title>
+
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Optional favicon -->
+    <link rel="icon" href="/manifest-assets/icon-192.png" sizes="192x192">
+
+    <!-- axios -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
+
+    <!-- Scripts with defer download in parallel but execute only after the HTML is fully parsed -->
+    <script defer src="script.js"></script>
+</head>
+
+<body>
+    <h1 style="text-align: center;">YES Print</h1>
+    <p style="text-align: center; color: gray; font-style: italic;">
+        ALWAYS YES
+    </p>
+
+    <div hidden id="modal">
+        <!-- <div> Full Screen Install Modal </div> -->
+        <h1 style="margin: 20px;"> Install YES Print App</h1>
+        <div style="display: flex; justify-content: center; margin-top: 30px;">
+            <button id="install-btn-1"> Install Now</button>
+            <button id="maybe-later-btn">Later</button>
+        </div>
+    </div>
+
+    <!-- Button on top-right corner -->
+    <button hidden id="install-btn-2">Install App</button>
+
+
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 30px;">
+        <button style="margin-top: 20px; padding: 5px 10px; background: transparent;" onclick="location.reload()">Reload
+            Page</button>
+    </div>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        #modal {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+
+            margin: auto;
+            text-align: left;
+            border: 1px solid black;
+            border-radius: 5px;
+            width: 80vw;
+            height: 60vh;
+            padding-top: 30px;
+            font-size: 16px;
+            background: lightyellow;
+        }
+
+        /* Button on modal */
+        #install-btn-1 {
+            background: lightcoral;
+            padding: 15px;
+            font-weight: bold;
+        }
+
+        #maybe-later-btn {
+            background: lightgray;
+            padding: 15px;
+            font-weight: bold;
+            margin-left: 20px;
+        }
+
+        /* Button on top-rigth corner */
+        #install-btn-2 {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            padding: 10px;
+            background: lightcoral;
+            font-weight: bold;
+        }
+
+        button {
+            border-radius: 10px;
+        }
+    </style>
+</body>
+
+</html>
