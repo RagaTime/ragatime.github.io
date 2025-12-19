@@ -24,7 +24,10 @@ async function main() {
         // For debugging:
         const divEl = document.createElement('div');
         divEl.innerHTML = JSON.stringify(subscription);
-        document.body.append(divEl);
+        const divEl2 = document.createElement('div');
+        divEl2.style.fontWeight = 'bold';
+        divEl2.innerHTML = 'Subscription (to send notification for this site)?:';
+        document.body.append(divEl2, divEl);
     } else {
         // alert('Service Workers are not supported in this browser.');
         console.log('❌ Service Workers are not supported in this browser.');
