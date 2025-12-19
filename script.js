@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-const $ = document.querySelector.bind(document);
+const d = document; const $ = document.querySelector.bind(document);
 
 var subscription;
 
@@ -34,6 +34,25 @@ async function main() {
     }
 }
 main();
+
+let count = 0;
+async function getTestPushNotification() {
+    // Send Push Notification
+    console.log("🚀 Calling Push-Notification-API to get Test Push Notification");
+    count++;
+    const notification = {
+        title: 'Title ' + count,
+        body: "Body " + count,
+        icon: "http://image.ibb.co/frYOFd/tmlogo.png",
+    };
+    const API_URL = 'https://api-dev.mypot.in/api/v1/raga-time';
+    const response = await axios.post(API_URL + '/push-notification', { subscription, notification });
+    console.log("✅ Push-Notification-API Succeeded.", response.data);
+}
+
+const btn = d.createElement('button'); d.body.append(btn);
+btn.innerText = 'Get Test Push Notification';
+btn.onclick = getTestPushNotification;
 
 // We use this to show the full screen modal only once and then we show small button only.
 // TODO: we can store this in localStorage to remember user choice across sessions.
