@@ -51,7 +51,6 @@
     <script>
         $ = document.querySelector.bind(document); const $$ = document.querySelectorAll.bind(document); // optional for multiple elements
 
-        // Delete App: http://localhost:8080/?deleteApp=true
         const goToApp = () => {
             // Replace current page (no back)
             window.location.replace("https://mypot.in/yesprint-chats");
@@ -64,20 +63,26 @@
                 isPwaInstalledEl.textContent = isPwaInstalled === null ? 'null' : isPwaInstalled;
             }
         }
+        renderPwaInstalledEl();
 
         // This event is fired when PWA is successfully installed:
         window.addEventListener('appinstalled', () => {
             localStorage.setItem('isPwaInstalled', 'true');
-            isPwaInstalledEl.textContent = 'true';
+            // Re-render the pwa icon with updated value.
+            renderPwaInstalledEl();
             // Show setup app button after pwa was installed:
             $('#setup-app-btn').style = 'block';
         });
 
+        // App: http://localhost:8080
         runOnPageLoad();
         function runOnPageLoad() {
             const params = new URLSearchParams(window.location.search);
+            // Delete App: http://localhost:8080/?deleteApp=true
             if (params.get('deleteApp') === 'true') {
                 localStorage.setItem('isAppSetup', '');
+                localStorage.setItem('isPwaInstalled', '');
+                window.location.href = "/";
             } else {
                 const isAppSetup = localStorage.getItem('isAppSetup');
                 if (isAppSetup) {
