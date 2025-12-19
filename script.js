@@ -4,15 +4,21 @@ const $ = document.querySelector.bind(document);
 
 // Service Worker Registration
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-        .then(() => console.log('Service Worker registered'))
-        .catch(err => {
-            // console.log('Service Worker registration failed: ' + err.toString());
-            console.log('Service Worker registration failed:', err);
-        });
+    console.log("🚀 Registering Service Worker");
+    await navigator.serviceWorker.register('/sw.js');
+    console.log("✅ Service Worker Registered");
+
+    // Create Push Subscription
+    console.log("🚀 Creating a Push Subscription for the browser");
+    subscription = await register.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+    });
+    // console.log("🐞 subscription:", subscription);
+    console.log("✅ Push Subscription Created");
 } else {
     // alert('Service Workers are not supported in this browser.');
-    console.log('Service Workers are not supported in this browser.');
+    console.log('❌ Service Workers are not supported in this browser.');
 }
 
 // We use this to show the full screen modal only once and then we show small button only.

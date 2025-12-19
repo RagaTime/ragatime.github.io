@@ -5,3 +5,10 @@ self.addEventListener('install', e => {
 self.addEventListener('fetch', e => {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });
+
+// This is to be able to show notifications
+self.addEventListener("push", e => {
+    const data = e.data.json();
+    console.log("Push Received?", data);
+    self.registration.showNotification(data.title, data);
+});
