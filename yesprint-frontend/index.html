@@ -21,39 +21,6 @@
 </head>
 
 <body>
-    <script>
-        const goToApp = () => {
-            // Replace current page (no back)
-            window.location.replace("https://mypot.in/yesprint-chats");
-        };
-
-        function runOnPageLoad() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('deleteApp') === 'true') {
-                localStorage.setItem('isAppSetup', '');
-            } else {
-                const isAppSetup = localStorage.getItem('isAppSetup');
-                if (isAppSetup) {
-                    goToApp();
-                }
-            }
-        }
-        runOnPageLoad();
-
-        // To debug `runOnPageLoad()` we can run it after 3_000.
-        // setTimeout(runOnPageLoad, 3_000);
-
-        function setupApp() {
-            localStorage.setItem('isAppSetup', true);
-            goToApp();
-        }
-    </script>
-
-    <h1 style="text-align: center;">YES Print</h1>
-    <p style="text-align: center; color: gray; font-style: italic;">
-        ALWAYS YES
-    </p>
-
     <div hidden id="modal">
         <!-- <div> Full Screen Install Modal </div> -->
         <h1 style="margin: 20px;"> Install YES Print App</h1>
@@ -68,12 +35,66 @@
 
 
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 30px;">
-        <button style="margin-top: 20px; padding: 5px 10px; background: transparent;" onclick="location.reload()">Reload
-            Page</button>
+        <!-- <button style="margin-top: 20px; padding: 5px 10px; background: transparent;" onclick="location.reload()">
+            Reload Page
+        </button> -->
 
-        <button style="margin-top: 20px; padding: 5px 10px; background: transparent;" onclick="setupApp()">Setup
-            App</button>
+        <button id="setup-app-btn" style="display: none; margin-top: 20px; padding: 5px 10px; background: transparent;"
+            onclick="setupApp()">
+            Setup App
+        </button>
+
+        <!-- ❤️ ❤️ ❤️ ❤️ Enable this for debugging: ❤️ ❤️ ❤️ ❤️ -->
+        <!-- <div style="margin-top: 20px">isPwaInstalled: <span id="isPwaInstalled"></span></div> -->
     </div>
+
+    <script>
+        $ = document.querySelector.bind(document); const $$ = document.querySelectorAll.bind(document); // optional for multiple elements
+
+        // Delete App: http://localhost:8080/?deleteApp=true
+        const goToApp = () => {
+            // Replace current page (no back)
+            window.location.replace("https://mypot.in/yesprint-chats");
+        };
+
+        const isPwaInstalledEl = $('#isPwaInstalled');
+        function renderPwaInstalledEl() {
+            const isPwaInstalled = localStorage.getItem('isPwaInstalled');
+            if (isPwaInstalledEl) { // Learn: We only update element if it is in dom because we only need this for debugging purpose only.
+                isPwaInstalledEl.textContent = isPwaInstalled === null ? 'null' : isPwaInstalled;
+            }
+        }
+
+        // This event is fired when PWA is successfully installed:
+        window.addEventListener('appinstalled', () => {
+            localStorage.setItem('isPwaInstalled', 'true');
+            isPwaInstalledEl.textContent = 'true';
+            // Show setup app button after pwa was installed:
+            $('#setup-app-btn').style = 'block';
+        });
+
+        runOnPageLoad();
+        function runOnPageLoad() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('deleteApp') === 'true') {
+                localStorage.setItem('isAppSetup', '');
+            } else {
+                const isAppSetup = localStorage.getItem('isAppSetup');
+                if (isAppSetup) {
+                    goToApp();
+                }
+            }
+        }
+
+        // To debug `runOnPageLoad()` we can run it after 3_000.
+        // setTimeout(runOnPageLoad, 3_000);
+
+        function setupApp() {
+            localStorage.setItem('isAppSetup', true);
+            goToApp();
+        }
+    </script>
+
 
     <style>
         * {
