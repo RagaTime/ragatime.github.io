@@ -37,6 +37,14 @@ async function getTestPushNotification() {
         title: 'Title ' + count,
         body: "Body " + count,
         icon: "http://image.ibb.co/frYOFd/tmlogo.png",
+        data: {
+            // Learn: You need to define event handler for `notificationclick` to be able to open `url` link. Check file sw.js in ragatime.github.io source code. [TESTED]
+            url: 'https://ragatime.github.io/about'
+        },
+        // Learn: `actions` are not supported on iOS Safari
+        // actions: [
+        //     { action: 'open', title: 'View Query' }
+        // ]
     };
     // const API_URL = 'https://api-dev.mypot.in/api/v1/raga-time';
     const API_URL = 'https://api.mypot.in/api/v1/raga-time';
