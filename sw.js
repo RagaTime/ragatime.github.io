@@ -1,3 +1,4 @@
+// @ts-nocheck
 self.addEventListener('install', e => {
     e.waitUntil(caches.open('app-v1'));
 });
