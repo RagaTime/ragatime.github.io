@@ -43,8 +43,11 @@ async function getTestPushNotification() {
     console.log("✅ Push-Notification-API Succeeded.", response.data);
 }
 
-const btn = d.createElement('button'); d.body.append(btn);
+const btn = d.createElement('button');
+// d.body.append(btn);
+$('#button-container').append(btn);
 btn.innerText = 'Get Test Push Notification';
+btn.style.cssText = 'margin-top: 20px; padding: 5px 10px; background: transparent;';
 btn.onclick = getTestPushNotification;
 
 // We use this to show the full screen modal only once and then we show small button only.

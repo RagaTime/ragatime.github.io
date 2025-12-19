@@ -14,6 +14,7 @@ self.addEventListener("push", e => {
     self.registration.showNotification(data.title, data);
 });
 
+// This event listener is necessary to open the `url` in the notification data. [TESTED]
 self.addEventListener('notificationclick', event => {
     console.log('notificationclick: url?', event.notification.data?.url);
     event.notification.close();
