@@ -13,3 +13,19 @@ self.addEventListener("push", e => {
     console.log("Push Received?", data);
     self.registration.showNotification(data.title, data);
 });
+
+self.addEventListener('notificationclick', event => {
+    console.log('notificationclick: url?', event.notification.data?.url);
+    event.notification.close();
+    const url = event.notification.data?.url;
+    if (!url) return;
+    event.waitUntil(clients.openWindow(url));
+});
+
+// Learn: Below works such that clicking on notification opens the target url.
+// setInterval(() => {
+//     self.registration.showNotification('Test', {
+//         body: 'Click me',
+//         data: { url: 'https://google.com' }
+//     });
+// }, 10_000);
