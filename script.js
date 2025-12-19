@@ -38,7 +38,8 @@ async function getTestPushNotification() {
         body: "Body " + count,
         icon: "http://image.ibb.co/frYOFd/tmlogo.png",
     };
-    const API_URL = 'https://api-dev.mypot.in/api/v1/raga-time';
+    // const API_URL = 'https://api-dev.mypot.in/api/v1/raga-time';
+    const API_URL = 'https://api.mypot.in/api/v1/raga-time';
     const response = await axios.post(API_URL + '/push-notification', { subscription, notification });
     console.log("✅ Push-Notification-API Succeeded.", response.data);
 }
