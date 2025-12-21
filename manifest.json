@@ -3,7 +3,7 @@
   "short_name": "RagaTime",
   "description": "RagaTime",
   "start_url": "/",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "orientation": "any",
