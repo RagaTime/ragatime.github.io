@@ -3,7 +3,7 @@
   "short_name": "YES Print",
   "description": "YES Print",
   "start_url": "/",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "orientation": "any",
