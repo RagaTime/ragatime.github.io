@@ -2,18 +2,19 @@
 
 const $ = document.querySelector.bind(document);
 
+// * Note to Sahil: I do not need service worker registration for yesprint's needs.
 // Service Worker Registration
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-        .then(() => console.log('Service Worker registered'))
-        .catch(err => {
-            // console.log('Service Worker registration failed: ' + err.toString());
-            console.log('Service Worker registration failed:', err);
-        });
-} else {
-    // alert('Service Workers are not supported in this browser.');
-    console.log('Service Workers are not supported in this browser.');
-}
+// if ('serviceWorker' in navigator) {
+//     navigator.serviceWorker.register('/sw.js')
+//         .then(() => console.log('Service Worker registered'))
+//         .catch(err => {
+//             // console.log('Service Worker registration failed: ' + err.toString());
+//             console.log('Service Worker registration failed:', err);
+//         });
+// } else {
+//     // alert('Service Workers are not supported in this browser.');
+//     console.log('Service Workers are not supported in this browser.');
+// }
 
 // We use this to show the full screen modal only once and then we show small button only.
 // TODO: we can store this in localStorage to remember user choice across sessions.
