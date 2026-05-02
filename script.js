@@ -52,9 +52,19 @@ async function getTestPushNotification() {
     console.log("✅ Push-Notification-API Succeeded.", response.data);
 }
 
+const dom = {
+    // pwa
+    modal: $("#modal"),
+    installBtn1: $('#install-btn-1'),
+    mayBeLaterBtn: $('#maybe-later-btn'),
+    installBtn2: $('#install-btn-2'),
+    // others
+    btnContainer: $('#button-container'),
+};
+
 const btn = d.createElement('button');
 // d.body.append(btn);
-$('#button-container').append(btn);
+dom.btnContainer.append(btn);
 btn.innerText = 'Get Test Push Notification';
 btn.style.cssText = 'margin-top: 20px; padding: 5px 10px; background: transparent;';
 btn.onclick = getTestPushNotification;
@@ -75,15 +85,15 @@ window.addEventListener('beforeinstallprompt', (e) => {
     installPromptEvent = e;
     if (isFirstEventFire_beforeinstallprompt) {
         isFirstEventFire_beforeinstallprompt = false;
-        $("#modal").removeAttribute("hidden");
+        dom.modal.removeAttribute("hidden");
     }
 });
 
-$('#install-btn-1').addEventListener('click', handleInstall);
-$('#install-btn-2').addEventListener('click', handleInstall);
-$('#maybe-later-btn').addEventListener('click', () => {
-    $("#modal").setAttribute("hidden", true);
-    $("#install-btn-2").removeAttribute("hidden");
+dom.installBtn1.addEventListener('click', handleInstall);
+dom.installBtn2.addEventListener('click', handleInstall);
+dom.mayBeLaterBtn.addEventListener('click', () => {
+    dom.modal.setAttribute("hidden", true);
+    dom.installBtn2.removeAttribute("hidden");
 });
 
 async function handleInstall() {
@@ -98,13 +108,13 @@ async function handleInstall() {
     // alert(isAccepted ? 'Accepted ✅' : 'Rejected ❌');
     console.log(`Install prompt was: ${result.outcome}`); // "accepted" or "dismissed"
 
-    $("#modal").setAttribute("hidden", true); // Hide modal if accepted
+    dom.modal.setAttribute("hidden", true); // Hide modal if accepted
     if (isAccepted) {
         // Hide `install-btn-2` if accepted
-        $("#install-btn-2").setAttribute("hidden", true);
+        dom.installBtn2.setAttribute("hidden", true);
     } else {
         // Show `install-btn-2` if rejected
-        $("#install-btn-2").removeAttribute("hidden");
+        dom.installBtn2.removeAttribute("hidden");
     }
 }
 

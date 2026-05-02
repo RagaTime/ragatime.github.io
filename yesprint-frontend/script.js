@@ -16,6 +16,14 @@ const $ = document.querySelector.bind(document);
 //     console.log('Service Workers are not supported in this browser.');
 // }
 
+const dom = {
+    // pwa
+    modal: $("#modal"),
+    installBtn1: $('#install-btn-1'),
+    mayBeLaterBtn: $('#maybe-later-btn'),
+    installBtn2: $('#install-btn-2'),
+};
+
 // We use this to show the full screen modal only once and then we show small button only.
 // TODO: we can store this in localStorage to remember user choice across sessions.
 let isFirstEventFire_beforeinstallprompt = true;
@@ -32,15 +40,15 @@ window.addEventListener('beforeinstallprompt', (e) => {
     installPromptEvent = e;
     if (isFirstEventFire_beforeinstallprompt) {
         isFirstEventFire_beforeinstallprompt = false;
-        $("#modal").removeAttribute("hidden");
+        dom.modal.removeAttribute("hidden");
     }
 });
 
-$('#install-btn-1').addEventListener('click', handleInstall);
-$('#install-btn-2').addEventListener('click', handleInstall);
-$('#maybe-later-btn').addEventListener('click', () => {
-    $("#modal").setAttribute("hidden", true);
-    $("#install-btn-2").removeAttribute("hidden");
+dom.installBtn1.addEventListener('click', handleInstall);
+dom.installBtn2.addEventListener('click', handleInstall);
+dom.mayBeLaterBtn.addEventListener('click', () => {
+    dom.modal.setAttribute("hidden", true);
+    dom.installBtn2.removeAttribute("hidden");
 });
 
 async function handleInstall() {
@@ -55,12 +63,12 @@ async function handleInstall() {
     // alert(isAccepted ? 'Accepted ✅' : 'Rejected ❌');
     console.log(`Install prompt was: ${result.outcome}`); // "accepted" or "dismissed"
 
-    $("#modal").setAttribute("hidden", true); // Hide modal if accepted
+    dom.modal.setAttribute("hidden", true); // Hide modal if accepted
     if (isAccepted) {
         // Hide `install-btn-2` if accepted
-        $("#install-btn-2").setAttribute("hidden", true);
+        dom.installBtn2.setAttribute("hidden", true);
     } else {
         // Show `install-btn-2` if rejected
-        $("#install-btn-2").removeAttribute("hidden");
+        dom.installBtn2.removeAttribute("hidden");
     }
 }
