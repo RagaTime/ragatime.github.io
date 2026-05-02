@@ -1,6 +1,12 @@
 # RagaTime
 
-## Links
+**Notes:**
+
+1. I have disabled jekyll by adding `.nojekll` because I don’t want GitHub Pages to process your site with Jekyll.
+2. Icons are necessary otherwise you click on `Add to homescreen` button you won't see the `Install` button rather you'll see a "Editable App" name field with "Add" button which looks pathetic.
+3. I made two icons with 192x192 and 512x512 size usin figma.
+
+### Links
 
 - Tech Documentation:
   - MDN Docs - Window: beforeinstallprompt event: [Clickh here](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeinstallprompt_event)
@@ -21,9 +27,5 @@
     - I am getting Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner. 
   - Naming Suggestion for ragatime: [2](https://chatgpt.com/c/68e0c2aa-0718-8321-a4ad-c23eff814151)
   - Install UI Recommentaion: [3](https://chatgpt.com/c/68e4c57c-376c-8322-89e5-3e2412862d53)
-
-1. I have disabled jekyll by adding `.nojekll` because I don’t want GitHub Pages to process your site with Jekyll.
-2. Icons are necessary otherwise you click on `Add to homescreen` button you won't see the `Install` button rather you'll see a "Editable App" name field with "Add" button which looks pathetic.
-3. I made two icons with 192x192 and 512x512 size usin figma.
 
 Thanks.
