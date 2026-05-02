@@ -64,7 +64,7 @@ btn.onclick = getTestPushNotification;
 let isFirstEventFire_beforeinstallprompt = true;
 
 // Prompt for installation
-let installPromptRef = { current: null };
+let installPromptEvent = null;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault(); // Prevent Chrome from showing the default prompt
     // Learn: Below line throws - Uncaught (in promise)
@@ -72,7 +72,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     //      'BeforeInstallPromptEvent': The prompt() method must be called
     //      with a user gesture
     // const result = await e.prompt();
-    installPromptRef.current = e;
+    installPromptEvent = e;
     if (isFirstEventFire_beforeinstallprompt) {
         isFirstEventFire_beforeinstallprompt = false;
         $("#modal").removeAttribute("hidden");
@@ -87,15 +87,14 @@ $('#maybe-later-btn').addEventListener('click', () => {
 });
 
 async function handleInstall() {
-    const installPrompt = installPromptRef.current;
-    if (!installPrompt) {
+    if (!installPromptEvent) {
         // alert("Install prompt not available");
         console.log("Install prompt not available");
         return;
     }
-    const result = await installPrompt.prompt();
+    const result = await installPromptEvent.prompt();
     const isAccepted = result.outcome === 'accepted';
-    installPromptRef.current = null;
+    installPromptEvent = null;
     // alert(isAccepted ? 'Accepted ✅' : 'Rejected ❌');
     console.log(`Install prompt was: ${result.outcome}`); // "accepted" or "dismissed"
 
