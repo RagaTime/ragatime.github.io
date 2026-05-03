@@ -948,7 +948,7 @@
       <div class="card-title-row" style="justify-content: center;">
         <div class="feed-card-actions">
           <div class="feed-view-switch">
-            <button class="btn-secondary active" type="button" data-feed-view="feed">My Feed</button>
+            <button class="btn-secondary" type="button" data-feed-view="feed">My Feed</button>
             <button class="btn-secondary" type="button" data-feed-view="mine">My Docs</button>
           </div>
           <button class="text-btn" id="btn-refresh-feed">Refresh</button>
@@ -1173,7 +1173,11 @@
     lastDirection: null,
     pendingUsernameOrEmail: null,
     authMode: 'register',
-    activeFeedView: 'feed',
+    // Setting default feed view to 'mine' because it is more likely
+    //  that user would want to see their own documents first and then
+    //  explore the feed. This also encourages users to create
+    //  documents to see in their feed.
+    activeFeedView: 'mine', // 'feed' | 'mine'
   };
 
   const parseTags = value => value
