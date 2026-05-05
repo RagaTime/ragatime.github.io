@@ -1,6 +1,6 @@
 # Learn: These notes added to archlinux doc (search for: "Public Files Server")
 
-DEPLOY_DIR=lineflow-frontend
+DEPLOY_DIR=ravinder-frontend
 
 # Learn: Creating folder is and changing ownershitp is required for once only
 #        so that I can copy file via `scp` via user1
