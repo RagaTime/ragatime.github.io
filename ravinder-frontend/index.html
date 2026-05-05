@@ -1,1 +1,436 @@
-Hello from Ravinder Kumar.
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ravinder Kumar | Indoor Plantation & Gardening</title>
+  <meta name="description" content="Indoor plantation and gardening services by Ravinder Kumar at ravinder.mpyot.in" />
+  <style>
+    :root {
+      --bg: #f4f1e8;
+      --panel: rgba(255, 255, 255, 0.82);
+      --text: #183028;
+      --muted: #4f665c;
+      --accent: #2d7d46;
+      --accent-dark: #1f5d34;
+      --accent-soft: #dff1e4;
+      --border: rgba(24, 48, 40, 0.12);
+      --shadow: 0 24px 60px rgba(24, 48, 40, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #d9efd9 0, transparent 32%),
+        radial-gradient(circle at top right, #f6ddc0 0, transparent 30%),
+        linear-gradient(180deg, #fbfaf5 0%, var(--bg) 100%);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .shell {
+      width: min(960px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+    }
+
+    .hero {
+      padding: clamp(28px, 5vw, 64px);
+      display: grid;
+      gap: 24px;
+      grid-template-columns: 1.4fr 1fr;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(45, 125, 70, 0.14);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.3rem, 5vw, 4.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+    }
+
+    .lead {
+      margin: 18px 0 0;
+      font-size: clamp(1.02rem, 2vw, 1.2rem);
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 44ch;
+    }
+
+    .actions {
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 20px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button.primary {
+      background: linear-gradient(135deg, var(--accent) 0%, #3f9a58 100%);
+      color: white;
+      box-shadow: 0 14px 28px rgba(45, 125, 70, 0.25);
+    }
+
+    .button.secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.62));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .stat {
+      display: grid;
+      gap: 6px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(24, 48, 40, 0.08);
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .stat strong {
+      font-size: 1.05rem;
+    }
+
+    .contact {
+      display: none;
+      margin: 0 28px 28px;
+      padding: 22px;
+      border-radius: 22px;
+      background: #fff;
+      border: 1px solid rgba(24, 48, 40, 0.1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    .contact.visible {
+      display: grid;
+      gap: 14px;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .contact-item {
+      padding: 16px;
+      border-radius: 18px;
+      background: #f7faf7;
+      border: 1px solid rgba(24, 48, 40, 0.08);
+    }
+
+    .contact-item label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .contact-item strong {
+      display: block;
+      font-size: 1rem;
+    }
+
+    .contact-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .whatsapp {
+      background: #25d366;
+      color: white;
+    }
+
+    .phone {
+      background: #183028;
+      color: white;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(12, 24, 20, 0.52);
+      z-index: 20;
+    }
+
+    .modal.visible {
+      display: flex;
+    }
+
+    .modal-panel {
+      width: min(480px, 100%);
+      background: white;
+      border-radius: 24px;
+      border: 1px solid rgba(24, 48, 40, 0.1);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+      padding: 24px;
+    }
+
+    .modal-panel h3 {
+      margin: 0 0 8px;
+      font-size: 1.45rem;
+    }
+
+    .modal-panel p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1px solid rgba(24, 48, 40, 0.16);
+      border-radius: 14px;
+      padding: 13px 14px;
+      font: inherit;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(45, 125, 70, 0.12);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .subtle {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    @media (max-width: 800px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">ravinder.mpyot.in</div>
+        <h1>Indoor plantation and gardening made simple.</h1>
+        <p class="lead">
+          Ravinder Kumar helps homes and offices stay green with indoor plants, care guidance,
+          and practical gardening support.
+        </p>
+        <div class="actions">
+          <button class="button primary" id="ctaButton" type="button">Get a quick callback</button>
+          <a class="button secondary" href="tel:+917969122518">Call Ravinder</a>
+        </div>
+        <p class="subtle">Service contact: <strong>7969122518</strong></p>
+      </div>
+
+      <aside class="card">
+        <h2>What you get</h2>
+        <div class="stat">
+          <span>Indoor plantation setup</span>
+          <strong>For homes, balconies, and workspaces</strong>
+        </div>
+        <div class="stat">
+          <span>Gardening help</span>
+          <strong>Plant selection, care, and maintenance</strong>
+        </div>
+        <div class="stat">
+          <span>Direct contact</span>
+          <strong>Call or WhatsApp Ravinder Kumar</strong>
+        </div>
+      </aside>
+    </section>
+
+    <section class="contact" id="contactSection" aria-live="polite">
+      <h2>Contact details</h2>
+      <div class="contact-grid">
+        <div class="contact-item">
+          <label>Customer name</label>
+          <strong id="customerName">-</strong>
+        </div>
+        <div class="contact-item">
+          <label>Customer phone</label>
+          <strong id="customerPhone">-</strong>
+        </div>
+        <div class="contact-item">
+          <label>Business contact</label>
+          <strong>7969122518</strong>
+        </div>
+      </div>
+      <div class="contact-actions">
+        <a class="button phone" href="tel:+917969122518">Call directly</a>
+        <a class="button whatsapp" id="whatsappButton" href="#" target="_blank" rel="noopener noreferrer">WhatsApp Ravinder</a>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="leadModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-panel">
+      <h3 id="modalTitle">Request a callback</h3>
+      <p>Share your name and phone number, and I’ll show the best way to contact Ravinder Kumar.</p>
+      <form id="leadForm">
+        <div class="field">
+          <label for="nameInput">Your name</label>
+          <input id="nameInput" name="name" type="text" placeholder="Enter your name" required />
+        </div>
+        <div class="field">
+          <label for="phoneInput">Your phone number</label>
+          <input id="phoneInput" name="phone" type="tel" placeholder="Enter your phone number" required />
+        </div>
+        <div class="modal-actions">
+          <button class="button secondary" id="cancelButton" type="button">Cancel</button>
+          <button class="button primary" type="submit">Show contact options</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const ctaButton = document.getElementById('ctaButton');
+    const leadModal = document.getElementById('leadModal');
+    const leadForm = document.getElementById('leadForm');
+    const cancelButton = document.getElementById('cancelButton');
+    const contactSection = document.getElementById('contactSection');
+    const customerName = document.getElementById('customerName');
+    const customerPhone = document.getElementById('customerPhone');
+    const whatsappButton = document.getElementById('whatsappButton');
+    const nameInput = document.getElementById('nameInput');
+    const phoneInput = document.getElementById('phoneInput');
+
+    const businessPhone = '7969122518';
+    const whatsappMessage = (name, phone) =>
+      `https://wa.me/91${businessPhone}?text=${encodeURIComponent(
+        `Hello Ravinder Kumar, I am ${name}. My phone number is ${phone}. I need indoor plantation and gardening help.`
+      )}`;
+
+    function openModal() {
+      leadModal.classList.add('visible');
+      nameInput.focus();
+    }
+
+    function closeModal() {
+      leadModal.classList.remove('visible');
+      leadForm.reset();
+    }
+
+    ctaButton.addEventListener('click', openModal);
+    cancelButton.addEventListener('click', closeModal);
+    leadModal.addEventListener('click', (event) => {
+      if (event.target === leadModal) {
+        closeModal();
+      }
+    });
+
+    leadForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+
+      customerName.textContent = name;
+      customerPhone.textContent = phone;
+      whatsappButton.href = whatsappMessage(name, phone);
+      contactSection.classList.add('visible');
+
+      closeModal();
+      contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  </script>
+</body>
+</html>

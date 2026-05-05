@@ -1,0 +1,8 @@
+Please make a minimal website for my indoor plantation and gardening business.
+
+- Domain is ravinder.mpyot.in
+- My name Ravinder Kumar and my phone number is 7969122518
+- Add a call to action button, and clicking on it asks the name of customer and phone number via a popup and then show:
+    - contact number
+    - button to call directly
+    - a WhatsApp button to message me
