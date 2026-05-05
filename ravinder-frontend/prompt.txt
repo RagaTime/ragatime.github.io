@@ -8,3 +8,5 @@ Please make a full fledged website for my indoor plantation and gardening busine
     - a WhatsApp button to message me
 - Location of service in Panchkula, Chandigarh and Mohali.
 - Please use indoor-plants.txt file to update site along with photo ((from unsplash)) and please first verify that every image url is valid.
+
+For deployment use `copy-to-linode.sh` script. If it doesn't output anything on successful deployment.

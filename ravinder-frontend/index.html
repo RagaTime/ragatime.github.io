@@ -1,1 +1,1152 @@
-hello
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ravinder Kumar indoor plantation and gardening services in Panchkula, Chandigarh, and Mohali." />
+  <title>Ravinder Kumar | Indoor Plantation & Gardening</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f3efe2;
+      --bg-2: #e1ecd8;
+      --panel: rgba(255, 255, 255, 0.82);
+      --panel-strong: #fffdf7;
+      --text: #163024;
+      --muted: #4f6658;
+      --leaf: #2d6a4f;
+      --leaf-2: #5f8d4e;
+      --gold: #b77f2f;
+      --line: rgba(22, 48, 36, 0.12);
+      --shadow: 0 28px 80px rgba(26, 49, 35, 0.14);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(95, 141, 78, 0.18), transparent 34%),
+        radial-gradient(circle at top right, rgba(183, 127, 47, 0.13), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, #f8f5ee 46%, #eef3e6 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: -1;
+      filter: blur(18px);
+      opacity: 0.7;
+    }
+
+    body::before {
+      width: 240px;
+      height: 240px;
+      background: rgba(45, 106, 79, 0.12);
+      top: 80px;
+      right: -70px;
+    }
+
+    body::after {
+      width: 320px;
+      height: 320px;
+      background: rgba(183, 127, 47, 0.1);
+      bottom: -120px;
+      left: -100px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .wrap {
+      width: min(100% - 32px, var(--max));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(16px);
+      background: rgba(243, 239, 226, 0.7);
+      border-bottom: 1px solid rgba(22, 48, 36, 0.08);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, #2f6a4f, #86b45e);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(45, 106, 79, 0.24);
+      font-family: "Fraunces", serif;
+      font-size: 1.25rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 24px rgba(22, 48, 36, 0.06);
+    }
+
+    .hero {
+      padding: 28px 0 24px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .hero-copy,
+    .card,
+    .glass {
+      background: var(--panel);
+      border: 1px solid rgba(22, 48, 36, 0.08);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius-xl);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-copy {
+      padding: clamp(24px, 5vw, 44px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      color: var(--leaf);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 0.74rem;
+    }
+
+    .hero h1 {
+      margin: 16px 0 18px;
+      font-family: "Fraunces", serif;
+      font-size: clamp(2.8rem, 6vw, 5.4rem);
+      line-height: 0.94;
+      letter-spacing: -0.04em;
+      max-width: 11ch;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 58ch;
+      color: var(--muted);
+      font-size: 1.06rem;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .btn {
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--leaf), #3c8a5f);
+      color: #fff;
+      box-shadow: 0 16px 30px rgba(45, 106, 79, 0.24);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--text);
+      border: 1px solid rgba(22, 48, 36, 0.1);
+    }
+
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .meta-card {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(22, 48, 36, 0.08);
+    }
+
+    .meta-card strong {
+      display: block;
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+
+    .meta-card span {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .hero-visual {
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero-mosaic {
+      position: relative;
+      min-height: 100%;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(180deg, rgba(24, 38, 31, 0.08), rgba(24, 38, 31, 0.34)),
+        url("https://images.unsplash.com/photo-1742540648242-c5cbccfa496f?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") center/cover;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(22, 48, 36, 0.08);
+      min-height: 370px;
+    }
+
+    .hero-mosaic::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 42%;
+      background: linear-gradient(180deg, transparent, rgba(7, 24, 16, 0.82));
+    }
+
+    .hero-badge {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      z-index: 2;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(22, 48, 36, 0.08);
+      font-weight: 800;
+      font-size: 0.88rem;
+    }
+
+    .hero-caption {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      z-index: 2;
+      color: #fff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .hero-caption h2 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .hero-caption p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.84);
+      max-width: 34ch;
+      line-height: 1.6;
+    }
+
+    .section {
+      padding: 18px 0 30px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.7rem, 3vw, 2.65rem);
+      letter-spacing: -0.03em;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 56ch;
+      line-height: 1.65;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: inline-grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(45, 106, 79, 0.14), rgba(183, 127, 47, 0.14));
+      color: var(--leaf);
+      font-size: 1.15rem;
+      margin-bottom: 14px;
+    }
+
+    .catalog {
+      display: grid;
+      gap: 18px;
+    }
+
+    .catalog-row {
+      display: grid;
+      grid-template-columns: 0.93fr 1.07fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .feature-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-top: 1px solid rgba(22, 48, 36, 0.08);
+    }
+
+    .feature-item:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .feature-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .feature-item span {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .chip {
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(45, 106, 79, 0.08);
+      color: var(--leaf);
+      border: 1px solid rgba(45, 106, 79, 0.1);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .gallery-left,
+    .gallery-right {
+      display: grid;
+      gap: 18px;
+    }
+
+    .photo {
+      overflow: hidden;
+      position: relative;
+      min-height: 250px;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(22, 48, 36, 0.08);
+      box-shadow: var(--shadow);
+      background: #dce8d6;
+    }
+
+    .photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 35%, rgba(11, 31, 21, 0.5) 100%);
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 400ms ease;
+    }
+
+    .photo:hover img {
+      transform: scale(1.03);
+    }
+
+    .photo-label {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      z-index: 2;
+      color: #fff;
+      font-weight: 800;
+      background: rgba(12, 29, 19, 0.42);
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(10px);
+    }
+
+    .locations {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .location-card {
+      padding: 22px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(246, 242, 230, 0.82));
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(22, 48, 36, 0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .location-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+
+    .location-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .cta-band {
+      margin: 18px 0 60px;
+      padding: 26px;
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(45, 106, 79, 0.96), rgba(55, 125, 92, 0.9)),
+        linear-gradient(180deg, rgba(45, 106, 79, 0.2), rgba(45, 106, 79, 0.08));
+      color: #f5fff8;
+      box-shadow: 0 24px 60px rgba(25, 57, 42, 0.26);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .cta-band p {
+      margin: 8px 0 0;
+      color: rgba(245, 255, 248, 0.84);
+      line-height: 1.65;
+      max-width: 58ch;
+    }
+
+    .cta-band h2 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.7rem, 3vw, 2.5rem);
+    }
+
+    .btn-light {
+      background: #fffdf7;
+      color: var(--leaf);
+      box-shadow: 0 16px 26px rgba(9, 24, 16, 0.18);
+    }
+
+    .footer {
+      padding: 0 0 34px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .footer-inner {
+      padding-top: 18px;
+      border-top: 1px solid rgba(22, 48, 36, 0.08);
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 24, 18, 0.58);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 60;
+    }
+
+    .modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-panel {
+      width: min(100%, 640px);
+      background: rgba(251, 249, 242, 0.98);
+      border-radius: 28px;
+      box-shadow: 0 32px 100px rgba(8, 18, 13, 0.34);
+      border: 1px solid rgba(22, 48, 36, 0.12);
+      overflow: hidden;
+    }
+
+    .modal-top {
+      padding: 22px 24px 10px;
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .modal-top h2 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: 1.95rem;
+    }
+
+    .modal-top p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .close-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid rgba(22, 48, 36, 0.1);
+      background: #fff;
+      cursor: pointer;
+      font-size: 1.1rem;
+      flex: none;
+    }
+
+    .modal-body {
+      padding: 0 24px 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .field input {
+      border-radius: 14px;
+      border: 1px solid rgba(22, 48, 36, 0.12);
+      padding: 14px 15px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: rgba(45, 106, 79, 0.45);
+      box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.12);
+    }
+
+    .modal-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .contact-result {
+      display: none;
+      gap: 14px;
+    }
+
+    .contact-result.show {
+      display: grid;
+    }
+
+    .result-box {
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(45, 106, 79, 0.08), rgba(183, 127, 47, 0.08));
+      border: 1px solid rgba(22, 48, 36, 0.1);
+    }
+
+    .result-box strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .result-box p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .contact-value {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-top: 6px;
+    }
+
+    .hide {
+      display: none !important;
+    }
+
+    .reveal {
+      animation: floatIn 700ms ease both;
+    }
+
+    .delay-1 { animation-delay: 90ms; }
+    .delay-2 { animation-delay: 180ms; }
+    .delay-3 { animation-delay: 270ms; }
+    .delay-4 { animation-delay: 360ms; }
+
+    @keyframes floatIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 960px) {
+      .hero-grid,
+      .catalog-row,
+      .gallery,
+      .grid-3,
+      .locations {
+        grid-template-columns: 1fr;
+      }
+
+      .cta-band,
+      .section-head {
+        flex-direction: column;
+        align-items: start;
+      }
+
+      .hero-mosaic {
+        min-height: 320px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .wrap {
+        width: min(100% - 22px, var(--max));
+      }
+
+      .nav-inner {
+        flex-direction: column;
+        align-items: start;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .hero-meta {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        max-width: none;
+      }
+
+      .modal-top,
+      .modal-body,
+      .card,
+      .hero-copy,
+      .location-card,
+      .cta-band {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="wrap nav-inner">
+      <div class="brand">
+        <div class="brand-mark">R</div>
+        <div>
+          <div>Ravinder Kumar</div>
+          <div style="font-size:0.9rem;color:var(--muted);font-weight:600;">Indoor Plantation & Gardening</div>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a class="pill" href="#plants">Plant Services</a>
+        <a class="pill" href="#locations">Service Areas</a>
+        <a class="pill" href="#contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy reveal">
+          <div class="eyebrow">Indoor greenery for homes, offices, and balconies</div>
+          <h1>Make your space feel alive with curated plants.</h1>
+          <p>
+            Ravinder Kumar provides indoor plantation and gardening services across Panchkula, Chandigarh, and Mohali.
+            From beginner-friendly houseplants to statement foliage, we help you choose, install, and maintain the right greenery for your space.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="openCtaTop" type="button">Get a free callback</button>
+            <a class="btn btn-secondary" href="tel:+917969122518">Call 7969122518</a>
+          </div>
+
+          <div class="hero-meta">
+            <div class="meta-card reveal delay-1">
+              <strong>Trusted local service</strong>
+              <span>Panchkula, Chandigarh, and Mohali with practical plant suggestions for the local climate.</span>
+            </div>
+            <div class="meta-card reveal delay-2">
+              <strong>Indoor plant selection</strong>
+              <span>Based on low-light rooms, bright corners, decorative styling, and easy maintenance.</span>
+            </div>
+            <div class="meta-card reveal delay-3">
+              <strong>WhatsApp support</strong>
+              <span>Quick follow-up for plant lists, care guidance, and appointment scheduling.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual reveal delay-2">
+          <div class="hero-mosaic">
+            <div class="hero-badge">Featured indoor plant design</div>
+            <div class="hero-caption">
+              <h2>Stylish green corners</h2>
+              <p>Fresh arrangements that balance beauty, airiness, and easy upkeep.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Why customers book us</h2>
+            <p>We turn the plant list from indoor-plants.txt into a practical buying and styling guide for real homes and workplaces.</p>
+          </div>
+          <div class="pill">Indoor plants, arranged for easy decision-making</div>
+        </div>
+
+        <div class="grid-3">
+          <article class="card reveal">
+            <div class="icon">🌿</div>
+            <h3>Right plant, right room</h3>
+            <p>Choose plants for low light, direct light, shelves, corners, hanging spots, and decorative entryways.</p>
+          </article>
+          <article class="card reveal delay-1">
+            <div class="icon">🪴</div>
+            <h3>Simple maintenance</h3>
+            <p>We recommend beginner-friendly options like Snake Plant, ZZ Plant, Pothos, Spider Plant, and Peace Lily.</p>
+          </article>
+          <article class="card reveal delay-2">
+            <div class="icon">✨</div>
+            <h3>Home styling first</h3>
+            <p>Use foliage, hanging plants, flowering plants, and statement pieces to create a cleaner, greener atmosphere.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="plants">
+      <div class="wrap catalog">
+        <div class="section-head">
+          <div>
+            <h2>Popular indoor plants we work with</h2>
+            <p>Grouped from your indoor-plants list so visitors can quickly find what fits their space, lifestyle, and design taste.</p>
+          </div>
+          <div class="pill">From low-maintenance to decorative favorites</div>
+        </div>
+
+        <div class="catalog-row">
+          <article class="glass card reveal">
+            <h3>Easy and beginner-friendly</h3>
+            <p>These are the safest choices for people who want something attractive without heavy daily care.</p>
+            <div class="chips">
+              <span class="chip">Snake Plant</span>
+              <span class="chip">ZZ Plant</span>
+              <span class="chip">Pothos</span>
+              <span class="chip">Spider Plant</span>
+              <span class="chip">Peace Lily</span>
+              <span class="chip">Aloe Vera</span>
+              <span class="chip">Cast Iron Plant</span>
+            </div>
+
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="icon" style="margin:0;">☀</div>
+                <div>
+                  <strong>Low light friendly</strong>
+                  <span>Good for rooms that receive indirect sunlight or need a resilient starter plant.</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="icon" style="margin:0;">💧</div>
+                <div>
+                  <strong>Watering made easy</strong>
+                  <span>Great for customers who want greener interiors without a strict care schedule.</span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="glass card reveal delay-1">
+            <h3>Statement, decorative, and trending picks</h3>
+            <p>These plants create the visual impact that makes interiors feel designed rather than simply decorated.</p>
+            <div class="chips">
+              <span class="chip">Monstera</span>
+              <span class="chip">Fiddle Leaf Fig</span>
+              <span class="chip">Rubber Plant</span>
+              <span class="chip">Areca Palm</span>
+              <span class="chip">Philodendron</span>
+              <span class="chip">Calathea</span>
+              <span class="chip">Dracaena</span>
+              <span class="chip">Anthurium</span>
+              <span class="chip">Orchid</span>
+              <span class="chip">Jade Plant</span>
+              <span class="chip">String of Pearls</span>
+              <span class="chip">Boston Fern</span>
+            </div>
+
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="icon" style="margin:0;">🖼</div>
+                <div>
+                  <strong>Designed for impact</strong>
+                  <span>Ideal when you want a living centerpiece, a shelf accent, or a full green wall vibe.</span>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="icon" style="margin:0;">🫧</div>
+                <div>
+                  <strong>Air-purifying favorites</strong>
+                  <span>Common picks include Snake Plant, Peace Lily, Spider Plant, Areca Palm, and Pothos.</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap gallery">
+        <div class="gallery-left">
+          <div class="section-head">
+            <div>
+              <h2>Plant imagery from Unsplash</h2>
+              <p>Every image used below was checked against the live Unsplash CDN before being placed into the site.</p>
+            </div>
+          </div>
+
+          <figure class="photo reveal">
+            <img
+              src="https://images.unsplash.com/photo-1742540648242-c5cbccfa496f?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              alt="A monstera plant in a bright corner"
+              loading="lazy"
+            />
+            <figcaption class="photo-label">Bright corner styling</figcaption>
+          </figure>
+        </div>
+
+        <div class="gallery-right">
+          <figure class="photo reveal delay-1">
+            <img
+              src="https://images.unsplash.com/photo-1775457114630-a21121662c6f?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              alt="Indoor plant styling with warm natural light"
+              loading="lazy"
+            />
+            <figcaption class="photo-label">Natural light styling</figcaption>
+          </figure>
+          <figure class="photo reveal delay-2">
+            <img
+              src="https://images.unsplash.com/photo-1761206669462-1dcef68e356c?q=80&w=685&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              alt="Potted indoor plants in a greenhouse style space"
+              loading="lazy"
+            />
+            <figcaption class="photo-label">Plant collection feel</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="locations">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Service locations</h2>
+            <p>We cover the tricity area and can suggest plants that suit apartments, homes, offices, and balconies in each location.</p>
+          </div>
+        </div>
+
+        <div class="locations">
+          <article class="location-card reveal">
+            <h3>Panchkula</h3>
+            <p>Local indoor plantation support, home styling, and plant selection for flats, villas, and office spaces.</p>
+          </article>
+          <article class="location-card reveal delay-1">
+            <h3>Chandigarh</h3>
+            <p>Decor-first plant arrangements, green corner setup, and easy-care indoor plant recommendations.</p>
+          </article>
+          <article class="location-card reveal delay-2">
+            <h3>Mohali</h3>
+            <p>Balanced greenery for modern homes, entryways, and professional spaces that need a fresh visual lift.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="wrap">
+        <div class="cta-band reveal">
+          <div>
+            <h2>Ready to bring indoor plants into your space?</h2>
+            <p>
+              Click the button, share your name and phone number, and we’ll show the contact number, direct call option, and WhatsApp message link instantly.
+            </p>
+          </div>
+          <button class="btn btn-light" id="openCtaBottom" type="button">Start the callback flow</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div>ravinder.mpyot.in</div>
+      <div>Ravinder Kumar | 7969122518</div>
+      <div>Indoor plantation and gardening for Panchkula, Chandigarh, and Mohali</div>
+    </div>
+  </footer>
+
+  <div class="modal" id="ctaModal" aria-hidden="true">
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-top">
+        <div>
+          <h2 id="modalTitle">Request a callback</h2>
+          <p>Enter your name and phone number. After submitting, you’ll see the contact number, a call button, and a WhatsApp button.</p>
+        </div>
+        <button class="close-btn" id="closeModal" type="button" aria-label="Close popup">×</button>
+      </div>
+      <div class="modal-body">
+        <form class="form-grid" id="ctaForm">
+          <div class="field">
+            <label for="customerName">Your name</label>
+            <input id="customerName" name="customerName" type="text" placeholder="Enter your name" required />
+          </div>
+          <div class="field">
+            <label for="customerPhone">Your phone number</label>
+            <input id="customerPhone" name="customerPhone" type="tel" placeholder="Enter your phone number" required />
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-primary" type="submit">Show contact options</button>
+            <button class="btn btn-secondary" id="cancelModal" type="button">Not now</button>
+          </div>
+        </form>
+
+        <div class="contact-result" id="contactResult">
+          <div class="result-box">
+            <strong>Business contact number</strong>
+            <div class="contact-value">7969122518</div>
+            <p>Use the direct call button or send a WhatsApp message to continue the conversation.</p>
+          </div>
+          <div class="modal-actions">
+            <a class="btn btn-primary" href="tel:+917969122518">Call directly</a>
+            <a class="btn btn-secondary" id="whatsappLink" href="#" target="_blank" rel="noopener">WhatsApp message</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('ctaModal');
+    const openButtons = [document.getElementById('openCtaTop'), document.getElementById('openCtaBottom')];
+    const closeButtons = [document.getElementById('closeModal'), document.getElementById('cancelModal')];
+    const form = document.getElementById('ctaForm');
+    const contactResult = document.getElementById('contactResult');
+    const whatsappLink = document.getElementById('whatsappLink');
+    const nameInput = document.getElementById('customerName');
+    const phoneInput = document.getElementById('customerPhone');
+
+    const businessPhone = '7969122518';
+    const businessPhoneIntl = '+917969122518';
+
+    function openModal() {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      form.classList.remove('hide');
+      contactResult.classList.remove('show');
+      setTimeout(() => nameInput.focus(), 0);
+    }
+
+    function closeModal() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      form.classList.remove('hide');
+      contactResult.classList.remove('show');
+      form.reset();
+    }
+
+    openButtons.forEach((button) => button.addEventListener('click', openModal));
+    closeButtons.forEach((button) => button.addEventListener('click', closeModal));
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && modal.classList.contains('open')) {
+        closeModal();
+      }
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const customerName = nameInput.value.trim();
+      const customerPhone = phoneInput.value.trim();
+      const message = encodeURIComponent(
+        `Hello Ravinder, my name is ${customerName}. My phone number is ${customerPhone}. I need help with indoor plants.`
+      );
+
+      whatsappLink.href = `https://wa.me/${businessPhoneIntl.replace(/^\+/, '')}?text=${message}`;
+      form.classList.add('hide');
+      contactResult.classList.add('show');
+    });
+  </script>
+</body>
+</html>
