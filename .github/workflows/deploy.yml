@@ -25,7 +25,7 @@ jobs:
     #   - name: Force failure (test)
     #     run: exit 1
 
-      - name: Notify Telegram (only on success)
+      - name: Notify Telegram (on success)
         if: success()
         run: |
             curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
