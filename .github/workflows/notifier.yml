@@ -1,4 +1,4 @@
-name: Notify after Pages deploy
+name: Notify after Github Pages deployment
 
 on:
   workflow_run:
