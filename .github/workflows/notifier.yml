@@ -2,7 +2,7 @@ name: Notify after Pages deploy
 
 on:
   workflow_run:
-    workflows: ["pages build and deployment"]
+    workflows: ["pages-build-deployment"]
     # Learn: Trigger this file workflow only when above mentioned workflow (s) finishes
     #        (success or failure)
     types:
