@@ -1,0 +1,28 @@
+name: Notify after Pages deploy
+
+on:
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    # Learn: Trigger this file workflow only when above mentioned workflow (s) finishes
+    #        (success or failure)
+    types:
+      - completed
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify Telegram (only on success)
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="✅ Site is live: https://<your-username>.github.io/<repo>/"
+
+      - name: Notify Telegram (on failure)
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="❌ Pages deployment failed"
