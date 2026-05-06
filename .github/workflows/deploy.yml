@@ -14,7 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # your build/deploy steps here
+      # Learn: `peaceiris/actions-gh-pages` deploys the code only. Build happens in `pages
+      #        build and deployment` workflow automaitcally by github and then this workflow
+      #        is triggered and deploys the built code to GitHub Pages.
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
