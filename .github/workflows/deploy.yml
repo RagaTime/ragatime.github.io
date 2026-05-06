@@ -22,14 +22,13 @@ jobs:
 
       - name: Notify Telegram (only on success)
         if: success()
-        env:
-            TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-            TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \
-          -d chat_id=${TELEGRAM_CHAT_ID} \
-          -d text="✅ Deployment successful: https://ragatime.github.io"
-      - name: Debug token length
-        run: echo "${#VAR1}"
-        env:
-            VAR1: ${{ secrets.VAR1 }}
+            curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="✅ Deployment successful: https://ragatime.github.io"
+      - name: Notify Telegram (on failure)
+        if: failure()
+        run: |
+            curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="❌ Deployment failed: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
