@@ -22,8 +22,8 @@ jobs:
           publish_dir: ./dist   # change as needed
 
       #   To test failure telegram notification, uncomment the following step to force a failure
-      - name: Force failure (test)
-        run: exit 1
+    #   - name: Force failure (test)
+    #     run: exit 1
 
       - name: Notify Telegram (only on success)
         if: success()
