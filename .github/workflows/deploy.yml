@@ -1,3 +1,4 @@
+# Source: https://chatgpt.com/c/69fb633b-ea50-83e8-b6f8-301e87f0293e
 name: Deploy + Notify
 permissions:
   contents: write
@@ -19,6 +20,10 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist   # change as needed
+
+      #   To test failure telegram notification, uncomment the following step to force a failure
+      - name: Force failure (test)
+        run: exit 1
 
       - name: Notify Telegram (only on success)
         if: success()
