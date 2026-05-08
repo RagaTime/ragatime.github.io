@@ -1016,7 +1016,8 @@
     const $ = document.querySelector.bind(document);
     const $$ = document.querySelectorAll.bind(document); // optional for multiple elements
 
-  const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.');
+  // const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.');
+  const isDev = false;
   const API_HOST = `https://api${isDev ? "-dev": ""}.mypot.in`;
   // Note: I am using localhost instead of api-dev.mypot.in for
   //       development untile my broadband starts working again.
