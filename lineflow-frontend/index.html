@@ -1506,7 +1506,7 @@
 
   const showNonOwnedReadingNotice = () => {
     alert(
-      'The progress will not be saved for this session because reading progress is saved only for the documents you own. To create your own copy of this document, use the COPY button to copy it to "My Docs" and start reading that document instead.\n\nHappy reading ✨'
+      'To be able to continue reading from where you left reading earlier - you must copy this document via COPY button and then read the newly created document from "My Docs".\n\nHappy reading ✨'
     );
   };
 
@@ -1515,7 +1515,10 @@
   };
 
   const closeReaderPanel = () => {
-    alert(`Congrats you read ${getSessionLinesRead()} lines in this session 🎉`);
+    const linesRead = getSessionLinesRead();
+    if (linesRead !== 1) {
+      alert(`Congrats you read ${linesRead} lines in this session 🎉`);
+    }
     $('#reader-panel').classList.add('hidden');
     $('#control-panel').classList.remove('hidden');
     dom.swipeHint.style.opacity = '1';
