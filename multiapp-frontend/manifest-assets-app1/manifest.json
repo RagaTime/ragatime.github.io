@@ -1,7 +1,7 @@
 {
-  "name": "Sub App 1",
-  "short_name": "Sub App 1",
-  "description": "Sub App 1",
+  "name": "App 1",
+  "short_name": "App 1",
+  "description": "App 1",
   "start_url": "/app1.html",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -14,114 +14,125 @@
 </head>
 
 <body>
-    <button id="btn-load-app1" type="button">Load Sub App 1</button>
-    <button id="btn-load-app2" type="button">Load Sub App 2</button>
-    <button id="btn-install-app" type="button" hidden>Install App</button>
-    <p id="manifest-status">No sub app loaded yet.</p>
-    <p id="install-status" hidden>Install prompt not available yet.</p>
+    <style>
+        .status-lable {
+            color: white;
+            background: black;
+            padding: 0px 5px;
+            margin-right: 5px;
+            width: fit-content;
+        }
+        pre{
+            margin: 0;
+        }
+    </style>
+    <button id="btn-install-app1" type="button">Install App 1</button>
+    <button id="btn-install-app2" type="button">Install App 2</button>
+    <div style="display: flex; margin-top: 10px;">
+        <div class="status-lable">Manifest Load Status:</div>
+        <div id="manifest-status">No app loaded yet.</div>
+    </div>
+    <hr />
+    <div style="display: flex;">
+        <div class="status-lable">Install Status:</div>
+        <div id="install-status">Install prompt not available yet.</div>
+    </div>
+    <hr />
+    <div class="status-lable">Logs:</div>
+    <pre id="log-before-install-prompt"></pre>
 
     <script>
-        const manifestStatus = document.getElementById('manifest-status');
-        const btnLoadApp1 = document.getElementById('btn-load-app1');
-        const btnLoadApp2 = document.getElementById('btn-load-app2');
-        const btnInstallApp = document.getElementById('btn-install-app');
-        const installStatus = document.getElementById('install-status');
+        const $ = document.querySelector.bind(document);
+        const $$ = document.querySelectorAll.bind(document); // optional for multiple elements
+
+        const manifestStatus = $('#manifest-status');
+        const btnInstallApp1 = $('#btn-install-app1');
+        const btnInstallApp2 = $('#btn-install-app2');
+        const installStatus = $('#install-status');
         const manifestLinkId = 'lineflow-manifest-link';
         const manifests = {
             app1: {
-                label: 'Sub App 1',
+                label: 'App 1',
                 href: '/manifest-assets-app1/manifest.json',
                 icon: '/manifest-assets-app1/icon-192.png',
             },
             app2: {
-                label: 'Sub App 2',
+                label: 'App 2',
                 href: '/manifest-assets-app2/manifest.json',
                 icon: '/manifest-assets-app2/icon-192.png',
             },
         };
 
         let activeManifestKey = null;
-        let manifestLinkLoaded = false;
         let installPromptEvent = null;
+        let installPromptInProgress = false;
 
         const updateManifestStatus = () => {
             const activeManifest = activeManifestKey ? manifests[activeManifestKey] : null;
-            manifestStatus.textContent = activeManifest
-                ? `${activeManifest.label} manifest loaded.`
-                : 'No sub app loaded yet.';
-            btnLoadApp1.disabled = activeManifestKey === 'app1';
-            btnLoadApp2.disabled = activeManifestKey === 'app2';
-            btnLoadApp1.textContent = activeManifestKey === 'app1' ? 'Sub App 1 Loaded' : 'Load Sub App 1';
-            btnLoadApp2.textContent = activeManifestKey === 'app2' ? 'Sub App 2 Loaded' : 'Load Sub App 2';
-            btnInstallApp.hidden = !activeManifest;
-            btnInstallApp.textContent = activeManifest
-                ? `Install ${activeManifest.label}`
-                : 'Install App';
-            installStatus.hidden = !activeManifest;
+            manifestStatus.textContent = activeManifest ? `${activeManifest.label} manifest loaded.` : 'No app loaded yet.';
             if (!activeManifest) {
-                installStatus.textContent = 'Load a sub app manifest to enable install.';
+                installStatus.textContent = 'Load a app manifest to enable install.';
                 return;
             }
-            installStatus.textContent = installPromptEvent
-                ? `Install is ready for ${activeManifest.label}.`
-                : `${activeManifest.label} manifest is loaded, but install prompt is not ready yet.`;
+            installStatus.textContent = installPromptEvent ? `Install is ready for ${activeManifest.label}.` : `${activeManifest.label} manifest is loaded, but install prompt is not ready yet.`;
+        };
+
+        const promptInstall = async () => {
+            if (!installPromptEvent || installPromptInProgress) {
+                if (!installPromptEvent) { alert('Install prompt is not available yet. Please wait until the app is ready.'); }
+                if (installPromptInProgress) { alert('An install prompt is already in progress. Please complete it before trying again.'); }
+                return;
+            }
+            console.log('promptInstall - Installing..');
+
+            installPromptInProgress = true;
+            try {
+                const result = await installPromptEvent.prompt();
+                installStatus.textContent = `Install prompt was ${result.outcome}.`;
+            } finally {
+                installPromptEvent = null;
+                installPromptInProgress = false;
+                updateManifestStatus();
+            }
         };
 
         const loadManifest = (manifestKey) => {
             const manifest = manifests[manifestKey];
-            if (!manifest) {
-                return;
-            }
+            if (!manifest) { return; }
+            // Learn: Removing the existing manifest link is helpful
+            //        in case when I want called installing app1 and
+            //        then retry installing app1 again otherwise the
+            //        browser doesn't trigger beforeinstallprompt
+            //        because the manifest link is already loaded.
+            $('#lineflow-manifest-link')?.remove();
 
-            let link = document.getElementById(manifestLinkId);
-            if (!link) {
-                link = document.createElement('link');
-                link.id = manifestLinkId;
-                link.rel = 'manifest';
-                document.head.appendChild(link);
-            }
-
+            let link = document.createElement('link');
+            link.id = manifestLinkId;
+            link.rel = 'manifest';
+            document.head.appendChild(link);
             link.href = manifest.href;
+
             const favicon = document.querySelector('link[rel="icon"]');
             if (favicon) {
                 favicon.href = manifest.icon;
             }
 
             activeManifestKey = manifestKey;
-            manifestLinkLoaded = true;
-            installPromptEvent = null;
             updateManifestStatus();
         };
 
         window.addEventListener('beforeinstallprompt', (event) => {
             event.preventDefault();
+            // console.log('❤️beforeinstallprompt.')
+            $('#log-before-install-prompt').textContent += '\n❤️beforeinstallprompt event fired!';
+            console.log("🚀 ~ installPromptEvent?", installPromptEvent);
             installPromptEvent = event;
-            if (manifestLinkLoaded) {
-                updateManifestStatus();
-            }
-        });
-
-        btnInstallApp.addEventListener('click', async () => {
-            if (!installPromptEvent) {
-                installStatus.hidden = false;
-                installStatus.textContent = 'Install prompt is not available in this browser state.';
-                return;
-            }
-
-            const result = await installPromptEvent.prompt();
-            installPromptEvent = null;
-            installStatus.hidden = false;
-            installStatus.textContent = `Install prompt was ${result.outcome}.`;
             updateManifestStatus();
+            promptInstall();
         });
 
-        btnLoadApp1.addEventListener('click', () => {
-            loadManifest('app1');
-        });
-
-        btnLoadApp2.addEventListener('click', () => {
-            loadManifest('app2');
-        });
+        btnInstallApp1.addEventListener('click', () => loadManifest('app1'));
+        btnInstallApp2.addEventListener('click', () => loadManifest('app2'));
 
         updateManifestStatus();
     </script>
