@@ -1,7 +1,7 @@
 {
-  "name": "Sub App 2",
-  "short_name": "Sub App 2",
-  "description": "Sub App 2",
+  "name": "Sub App 1",
+  "short_name": "Sub App 1",
+  "description": "Sub App 1",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -10,12 +10,12 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/manifest-assets/icon-192.png",
+      "src": "/manifest-assets-app1/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/manifest-assets/icon-512.png",
+      "src": "/manifest-assets-app1/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

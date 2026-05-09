@@ -9,41 +9,67 @@
     <!-- Manifest -->
     <meta name="theme-color" content="#000000">
     <!-- Optional favicon -->
-    <link rel="icon" href="/manifest-assets/icon-192.png" sizes="192x192">
+    <!-- <link rel="icon" href="/manifest-assets-app1/icon-192.png" sizes="192x192"> -->
 
 </head>
 
 <body>
-    <button id="btn-load-manifest" type="button">Load Manifest</button>
+    <button id="btn-load-app1" type="button">Load Sub App 1</button>
+    <button id="btn-load-app2" type="button">Load Sub App 2</button>
     <button id="btn-install-app" type="button" hidden>Install App</button>
-    <p id="manifest-status">Manifest not loaded yet.</p>
+    <p id="manifest-status">No sub app loaded yet.</p>
     <p id="install-status" hidden>Install prompt not available yet.</p>
 
     <script>
         const manifestStatus = document.getElementById('manifest-status');
-        const btnLoadManifest = document.getElementById('btn-load-manifest');
+        const btnLoadApp1 = document.getElementById('btn-load-app1');
+        const btnLoadApp2 = document.getElementById('btn-load-app2');
         const btnInstallApp = document.getElementById('btn-install-app');
         const installStatus = document.getElementById('install-status');
         const manifestLinkId = 'lineflow-manifest-link';
+        const manifests = {
+            app1: {
+                label: 'Sub App 1',
+                href: '/manifest-assets-app1/manifest.json',
+                icon: '/manifest-assets-app1/icon-192.png',
+            },
+            app2: {
+                label: 'Sub App 2',
+                href: '/manifest-assets-app2/manifest.json',
+                icon: '/manifest-assets-app2/icon-192.png',
+            },
+        };
 
+        let activeManifestKey = null;
         let manifestLinkLoaded = false;
         let installPromptEvent = null;
 
         const updateManifestStatus = () => {
-            manifestStatus.textContent = manifestLinkLoaded
-                ? 'Manifest loaded.'
-                : 'Manifest not loaded yet.';
-            btnLoadManifest.disabled = manifestLinkLoaded;
-            btnLoadManifest.textContent = manifestLinkLoaded ? 'Manifest Loaded' : 'Load Manifest';
-            btnInstallApp.hidden = !manifestLinkLoaded;
-            installStatus.hidden = !manifestLinkLoaded;
+            const activeManifest = activeManifestKey ? manifests[activeManifestKey] : null;
+            manifestStatus.textContent = activeManifest
+                ? `${activeManifest.label} manifest loaded.`
+                : 'No sub app loaded yet.';
+            btnLoadApp1.disabled = activeManifestKey === 'app1';
+            btnLoadApp2.disabled = activeManifestKey === 'app2';
+            btnLoadApp1.textContent = activeManifestKey === 'app1' ? 'Sub App 1 Loaded' : 'Load Sub App 1';
+            btnLoadApp2.textContent = activeManifestKey === 'app2' ? 'Sub App 2 Loaded' : 'Load Sub App 2';
+            btnInstallApp.hidden = !activeManifest;
+            btnInstallApp.textContent = activeManifest
+                ? `Install ${activeManifest.label}`
+                : 'Install App';
+            installStatus.hidden = !activeManifest;
+            if (!activeManifest) {
+                installStatus.textContent = 'Load a sub app manifest to enable install.';
+                return;
+            }
             installStatus.textContent = installPromptEvent
-                ? 'Install is ready.'
-                : 'Manifest is loaded, but install prompt is not ready yet.';
+                ? `Install is ready for ${activeManifest.label}.`
+                : `${activeManifest.label} manifest is loaded, but install prompt is not ready yet.`;
         };
 
-        const addManifestLink = () => {
-            if (manifestLinkLoaded) {
+        const loadManifest = (manifestKey) => {
+            const manifest = manifests[manifestKey];
+            if (!manifest) {
                 return;
             }
 
@@ -52,16 +78,22 @@
                 link = document.createElement('link');
                 link.id = manifestLinkId;
                 link.rel = 'manifest';
-                link.href = '/manifest-assets-app1/manifest.json';
                 document.head.appendChild(link);
             }
 
+            link.href = manifest.href;
+            const favicon = document.querySelector('link[rel="icon"]');
+            if (favicon) {
+                favicon.href = manifest.icon;
+            }
+
+            activeManifestKey = manifestKey;
             manifestLinkLoaded = true;
+            installPromptEvent = null;
             updateManifestStatus();
         };
 
         window.addEventListener('beforeinstallprompt', (event) => {
-            // alert('event: beforeinstallprompt')
             event.preventDefault();
             installPromptEvent = event;
             if (manifestLinkLoaded) {
@@ -83,8 +115,12 @@
             updateManifestStatus();
         });
 
-        btnLoadManifest.addEventListener('click', () => {
-            addManifestLink();
+        btnLoadApp1.addEventListener('click', () => {
+            loadManifest('app1');
+        });
+
+        btnLoadApp2.addEventListener('click', () => {
+            loadManifest('app2');
         });
 
         updateManifestStatus();
