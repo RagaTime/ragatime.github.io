@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LineFlow — One Line at a Time</title>
+    <!-- For PWA -->
+    <!-- Manifest -->
+    <meta name="theme-color" content="#000000">
+    <!-- Optional favicon -->
+    <link rel="icon" href="/manifest-assets/icon-192.png" sizes="192x192">
+
+</head>
+
+<body>
+    <button id="btn-load-manifest" type="button">Load Manifest</button>
+    <button id="btn-install-app" type="button" hidden>Install App</button>
+    <p id="manifest-status">Manifest not loaded yet.</p>
+    <p id="install-status" hidden>Install prompt not available yet.</p>
+
+    <script>
+        const manifestStatus = document.getElementById('manifest-status');
+        const btnLoadManifest = document.getElementById('btn-load-manifest');
+        const btnInstallApp = document.getElementById('btn-install-app');
+        const installStatus = document.getElementById('install-status');
+        const manifestLinkId = 'lineflow-manifest-link';
+
+        let manifestLinkLoaded = false;
+        let installPromptEvent = null;
+
+        const updateManifestStatus = () => {
+            manifestStatus.textContent = manifestLinkLoaded
+                ? 'Manifest loaded.'
+                : 'Manifest not loaded yet.';
+            btnLoadManifest.disabled = manifestLinkLoaded;
+            btnLoadManifest.textContent = manifestLinkLoaded ? 'Manifest Loaded' : 'Load Manifest';
+            btnInstallApp.hidden = !manifestLinkLoaded;
+            installStatus.hidden = !manifestLinkLoaded;
+            installStatus.textContent = installPromptEvent
+                ? 'Install is ready.'
+                : 'Manifest is loaded, but install prompt is not ready yet.';
+        };
+
+        const addManifestLink = () => {
+            if (manifestLinkLoaded) {
+                return;
+            }
+
+            let link = document.getElementById(manifestLinkId);
+            if (!link) {
+                link = document.createElement('link');
+                link.id = manifestLinkId;
+                link.rel = 'manifest';
+                link.href = '/manifest-assets-app1/manifest.json';
+                document.head.appendChild(link);
+            }
+
+            manifestLinkLoaded = true;
+            updateManifestStatus();
+        };
+
+        window.addEventListener('beforeinstallprompt', (event) => {
+            // alert('event: beforeinstallprompt')
+            event.preventDefault();
+            installPromptEvent = event;
+            if (manifestLinkLoaded) {
+                updateManifestStatus();
+            }
+        });
+
+        btnInstallApp.addEventListener('click', async () => {
+            if (!installPromptEvent) {
+                installStatus.hidden = false;
+                installStatus.textContent = 'Install prompt is not available in this browser state.';
+                return;
+            }
+
+            const result = await installPromptEvent.prompt();
+            installPromptEvent = null;
+            installStatus.hidden = false;
+            installStatus.textContent = `Install prompt was ${result.outcome}.`;
+            updateManifestStatus();
+        });
+
+        btnLoadManifest.addEventListener('click', () => {
+            addManifestLink();
+        });
+
+        updateManifestStatus();
+    </script>
+</body>
+
+</html>
