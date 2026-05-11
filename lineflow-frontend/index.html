@@ -77,6 +77,12 @@
     box-shadow: 0 20px 50px rgba(0,0,0,0.45);
   }
 
+  @media (max-width: 600px) {
+    .panel{
+      padding: 0.5rem;
+    }
+  }
+
   .panel-card.hidden,
   .auth-toggle.hidden,
   .hidden {
@@ -240,6 +246,11 @@
     background: none;
     color: var(--muted);
     border: 1px solid transparent;
+  }
+
+  .card-actions > button {
+      color: var(--text);
+      border-color: var(--line);
   }
 
   /* Fixing wrapping of `READ COPY EDIT DELETE` buttons on smaller screens. */
