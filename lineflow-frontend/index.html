@@ -538,30 +538,40 @@
   }
 
   .swipe-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 7rem;
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1.5rem;
-    padding: 0 2rem 0.5rem;
-    margin-bottom: 1.5rem;
+    gap: 1rem;
+    padding: 0.35rem 0.85rem;
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(13, 13, 13, 0.72);
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+    z-index: 3;
   }
 
   .hint-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.2rem;
     opacity: 0.35;
   }
 
   .hint-arrow {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: var(--muted);
   }
 
   .hint-label {
     font-family: var(--font-mono);
-    font-size: 0.5rem;
+    font-size: 0.45rem;
     letter-spacing: 0.2em;
     color: var(--muted);
     text-transform: uppercase;
@@ -693,7 +703,7 @@
 
   .drag-indicator {
     position: fixed;
-    top: 50%;
+    top: 65%;
     left: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
@@ -787,6 +797,18 @@
   #reader-screen {
     /* This is to maintain 1.25 rem padding on the body tag so screen doesn't flickr. */
     scroll-margin-top: 1.25rem;
+  }
+
+  @media (max-width: 600px) {
+    .swipe-hint {
+      bottom: 6.25rem;
+      gap: 0.75rem;
+      padding: 0.3rem 0.65rem;
+    }
+
+    .hint-label {
+      display: none;
+    }
   }
 </style>
 </head>
