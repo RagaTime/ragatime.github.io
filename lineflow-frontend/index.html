@@ -517,7 +517,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.5rem 1.75rem 0;
-  }
+  } 
 
   .btn-back {
     background: none;
@@ -525,7 +525,7 @@
     border-radius: 2px;
     color: var(--muted);
     font-family: var(--font-mono);
-    font-size: 0.6rem;
+    font-size: 0.8rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     padding: 0.45rem 0.9rem;
@@ -581,7 +581,7 @@
     padding: 1rem 1.75rem 0.5rem;
     display: flex;
     flex-direction: column;
-    gap: 0.7rem;
+    gap: 0.75rem;
   }
 
   .reader-nav-row,
@@ -804,6 +804,10 @@
       bottom: 6.25rem;
       gap: 0.75rem;
       padding: 0.3rem 0.65rem;
+    }
+
+    .reader-top {
+      padding: 1.5rem 0 0;
     }
 
     .hint-label {
@@ -1035,6 +1039,12 @@
       <div id="reader-screen" class="screen hidden">
         <div class="reader-top">
           <button class="btn-back" id="btn-back">ｘ Close</button>
+          <div class="reader-font-row">
+            <button class="reader-font-btn" id="btn-font-increase" type="button">A+</button>
+            <button class="reader-font-btn" id="btn-font-reset" type="button">A</button>
+            <button class="reader-font-btn" id="btn-font-decrease" type="button">A-</button>
+            <div class="reader-font-size" id="reader-font-size-label">1.5rem</div>
+          </div>
         </div>
         <div class="reading-zone" id="reading-zone">
           <div class="line-display">
@@ -1058,12 +1068,6 @@
           <div class="reader-nav-row">
             <button class="nav-btn" id="btn-prev">← Prev</button>
             <button class="nav-btn primary" id="btn-next">Next →</button>
-          </div>
-          <div class="reader-font-row">
-            <button class="reader-font-btn" id="btn-font-increase" type="button">A+</button>
-            <button class="reader-font-btn" id="btn-font-reset" type="button">A</button>
-            <button class="reader-font-btn" id="btn-font-decrease" type="button">A-</button>
-            <div class="reader-font-size" id="reader-font-size-label">(1.5 rem)</div>
           </div>
         </div>
       </div>
@@ -1313,7 +1317,7 @@
   const applyReaderFontSize = () => {
     const sizeText = state.readerFontSizeRem.toFixed(1);
     dom.lineText.style.fontSize = `${sizeText}rem`;
-    dom.readerFontSizeLabel.textContent = `(${sizeText} rem)`;
+    dom.readerFontSizeLabel.textContent = `${sizeText}rem`;
   };
 
   const setReaderFontSize = nextValue => {
