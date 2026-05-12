@@ -1267,6 +1267,7 @@
     pendingUsernameOrEmail: null,
     authMode: 'register',
     readerFontSizeRem: DEFAULT_READER_FONT_SIZE_REM,
+    readerReturnScrollY: 0,
     // Setting default feed view to 'mine' because it is more likely
     //  that user would want to see their own documents first and then
     //  explore the feed. This also encourages users to create
@@ -1651,6 +1652,17 @@
     );
   };
 
+  const captureReaderReturnScroll = () => {
+    state.readerReturnScrollY = Math.max(0, Math.floor(window.scrollY || window.pageYOffset || 0));
+  };
+
+  const restoreReaderReturnScroll = () => {
+    const targetY = Math.max(0, Math.floor(state.readerReturnScrollY || 0));
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: targetY, behavior: 'auto' });
+    });
+  };
+
   const getSessionLinesRead = () => {
     return state.sessionLinesRead;
   };
@@ -1663,6 +1675,7 @@
     $('#reader-panel').classList.add('hidden');
     $('#control-panel').classList.remove('hidden');
     dom.swipeHint.style.opacity = '1';
+    restoreReaderReturnScroll();
   };
 
   const startReadingFromText = (content, documentId = null, startPosition = 0, documentUserId = null) => {
@@ -1671,6 +1684,7 @@
       setFeedback(dom.createFeedback, 'Add some text first.', 'error');
       return;
     }
+    captureReaderReturnScroll();
     state.lines = parsed;
     state.current = Math.min(Math.max(0, Math.floor(startPosition)), parsed.length - 1);
     state.startTime = Date.now();
