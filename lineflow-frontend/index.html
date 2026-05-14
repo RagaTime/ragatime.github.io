@@ -1748,14 +1748,23 @@
     showScreen('done');
   };
 
+  let readPositionDebounceTimerId = null;
+
   const persistReadPosition = () => {
-    if (!state.currentReadingDocId || !state.token || safeId(state.currentReadingDocUserId) !== state.user?.userId) return;
-    apiRequest(`/documents/${state.currentReadingDocId}/read-position`, {
-      method: 'PATCH',
-      body: { lastReadPosition: state.current },
-    }).catch(err => {
-      console.debug('read position sync failed', err.message);
-    });
+    const documentId = safeId(state.currentReadingDocId);
+    if (!documentId || !state.token || safeId(state.currentReadingDocUserId) !== state.user?.userId) return;
+
+    if (readPositionDebounceTimerId) clearTimeout(readPositionDebounceTimerId);
+
+    readPositionDebounceTimerId = setTimeout(() => {
+      readPositionDebounceTimerId = null;
+      apiRequest(`/documents/${documentId}/read-position`, {
+        method: 'PATCH',
+        body: { lastReadPosition: state.current },
+      }).catch(err => {
+        console.debug('read position sync failed', err.message);
+      });
+    }, 300);
   };
 
   const goNext = () => {
