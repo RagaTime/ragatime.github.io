@@ -19,6 +19,7 @@ async function main() {
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
         });
+        document.body.insertAdjacentHTML('beforeend', `<pre>${JSON.stringify(subscription.toJSON(), null, 2)}</pre>`);
         // console.log("🐞 subscription:", subscription);
         console.log("✅ Push Subscription Created");
     } else {
@@ -48,6 +49,7 @@ async function getTestPushNotification() {
     };
     // const API_URL = 'https://api-dev.mypot.in/api/v1/raga-time';
     const API_URL = 'https://api.mypot.in/api/v1/raga-time';
+    document.body.insertAdjacentText('beforeend', subscription);
     const response = await axios.post(API_URL + '/push-notification', { subscription, notification });
     console.log("✅ Push-Notification-API Succeeded.", response.data);
 }
