@@ -19,6 +19,7 @@ async function main() {
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
         });
+        document.body.insertAdjacentHTML('beforeend', '<pre>`subscription`:</pre>');
         document.body.insertAdjacentHTML('beforeend', `<pre>${JSON.stringify(subscription.toJSON(), null, 2)}</pre>`);
         // console.log("🐞 subscription:", subscription);
         console.log("✅ Push Subscription Created");
