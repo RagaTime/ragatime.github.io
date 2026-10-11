@@ -1104,6 +1104,11 @@
     gap: 0.75rem;
   }
 
+  .timer-active-banner.hidden,
+  .timer-custom-row.hidden {
+    display: none !important;
+  }
+
   .active-banner-info {
     display: flex;
     flex-direction: column;
@@ -3085,6 +3090,11 @@
       timerDom.ringIndicator.style.strokeDashoffset = String(offset);
     }
 
+    // Always keep activeBanner duration synced so it is never stuck
+    if (timerDom.activeTime) {
+      timerDom.activeTime.textContent = formatted;
+    }
+
     if (timer.status === 'running') {
       timerDom.btn.classList.add('running');
       timerDom.btn.classList.remove('paused');
@@ -3151,6 +3161,9 @@
 
       if (timerDom.activeBanner) {
         timerDom.activeBanner.classList.add('hidden');
+        if (timerDom.activeStatus) timerDom.activeStatus.textContent = 'PAUSED';
+        if (timerDom.activeTime) timerDom.activeTime.textContent = formatted;
+        if (timerDom.bannerToggleBtn) timerDom.bannerToggleBtn.textContent = 'Resume';
       }
     }
   };
@@ -3226,15 +3239,18 @@
     }
   };
 
-  const resetTimer = () => {
+  const resetTimer = newMinutes => {
     if (timer.intervalId) {
       clearInterval(timer.intervalId);
       timer.intervalId = null;
     }
-    timer.status = 'idle';
     timer.targetEndTime = null;
-    timer.totalSeconds = timer.sessionMins * 60;
+    if (newMinutes && !isNaN(newMinutes) && Number(newMinutes) > 0) {
+      timer.sessionMins = Number(newMinutes);
+    }
+    timer.totalSeconds = Math.round((timer.sessionMins || 25) * 60);
     timer.remainingSeconds = timer.totalSeconds;
+    timer.status = 'paused';
     updateTimerUI();
     saveTimerState();
   };
@@ -3448,7 +3464,14 @@
       toggleTimer();
     });
     timerDom.bannerResetBtn?.addEventListener('click', () => {
-      resetTimer();
+      let mins = timer.sessionMins;
+      if (timer.selectedPreset === 'custom') {
+        const val = parseInt(timerDom.customInput?.value, 10);
+        if (val && !isNaN(val) && val > 0) mins = val;
+      } else if (timer.selectedPreset) {
+        mins = Number(timer.selectedPreset) || timer.sessionMins;
+      }
+      resetTimer(mins);
     });
 
     // Presets
