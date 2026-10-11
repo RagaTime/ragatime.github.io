@@ -810,9 +810,531 @@
       padding: 1.5rem 0 0;
     }
 
-    .hint-label {
-      display: none;
+  /* =========================================================
+     GLOBAL TIMER STYLES
+     ========================================================= */
+  .btn-timer-trigger {
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    padding: 0.35rem 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-timer-trigger:hover {
+    border-color: var(--accent);
+    background: rgba(200, 169, 110, 0.08);
+  }
+
+  /* Floating Timer Widget */
+  .floating-timer-widget {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-direction: row-reverse;
+    user-select: none;
+    touch-action: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  /* When inside reader screen, position comfortably above reader bottom nav on mobile */
+  @media (max-width: 600px) {
+    body.in-reader-mode .floating-timer-widget,
+    body:has(#reader-panel:not(.hidden)) .floating-timer-widget {
+      bottom: 5.25rem;
+      right: 1rem;
     }
+  }
+
+  /* Floating Round Button */
+  .floating-timer-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: #181818;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 0 1.5px rgba(200, 169, 110, 0.45);
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+    padding: 0;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .floating-timer-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 18px rgba(200, 169, 110, 0.55);
+  }
+
+  .floating-timer-btn:active {
+    transform: scale(0.95);
+  }
+
+  .floating-timer-btn.running {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 16px rgba(200, 169, 110, 0.5);
+  }
+
+  .floating-timer-btn.paused {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 14px rgba(212, 163, 89, 0.45);
+  }
+
+  /* SVG Progress Ring */
+  .timer-ring-svg {
+    position: absolute;
+    inset: 0;
+    width: 56px;
+    height: 56px;
+    transform: rotate(-90deg);
+    pointer-events: none;
+  }
+
+  .timer-ring-track {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.08);
+    stroke-width: 3;
+  }
+
+  .timer-ring-indicator {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-dasharray: 144.513;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.35s linear, stroke 0.3s ease;
+  }
+
+  .floating-timer-btn.paused .timer-ring-indicator {
+    stroke: var(--muted);
+  }
+
+  .timer-btn-icon {
+    position: relative;
+    z-index: 2;
+    font-size: 1.15rem;
+    line-height: 1;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, color 0.2s ease;
+    user-select: none;
+  }
+
+  .floating-timer-btn.running .timer-btn-icon {
+    font-size: 0.95rem;
+    letter-spacing: -2px;
+  }
+
+  /* Floating Time Pill */
+  .floating-timer-pill {
+    background: rgba(22, 22, 22, 0.92);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.38rem 0.65rem 0.38rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .floating-timer-pill:hover {
+    border-color: var(--accent);
+    background: rgba(28, 28, 28, 0.96);
+  }
+
+  .timer-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: background 0.2s ease;
+  }
+
+  .timer-pill-dot.running {
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse-dot 1.8s infinite ease-in-out;
+  }
+
+  .timer-pill-dot.paused {
+    background: #d4a359;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.7); }
+  }
+
+  .timer-pill-time {
+    letter-spacing: 0.08em;
+    font-weight: 400;
+  }
+
+  .timer-pill-config-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 2px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease, transform 0.2s ease;
+  }
+
+  .timer-pill-config-btn:hover {
+    color: var(--accent);
+    transform: rotate(45deg);
+  }
+
+  /* Modals Overlay */
+  .lf-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .lf-modal-backdrop.hidden {
+    display: none;
+    opacity: 0;
+  }
+
+  .lf-modal-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: relative;
+    animation: lf-modal-pop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes lf-modal-pop {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .lf-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .lf-modal-badge {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .lf-modal-header h2 {
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--text);
+    font-family: var(--font-display);
+  }
+
+  .lf-modal-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    line-height: 1;
+    transition: color 0.15s ease;
+  }
+
+  .lf-modal-close:hover {
+    color: var(--text);
+  }
+
+  /* Active Session Banner */
+  .timer-active-banner {
+    background: rgba(200, 169, 110, 0.08);
+    border: 1px solid rgba(200, 169, 110, 0.25);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .active-banner-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .active-banner-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .active-banner-time {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    color: var(--text);
+    letter-spacing: 0.05em;
+  }
+
+  .active-banner-actions {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  /* Presets Grid */
+  .timer-presets-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .timer-presets-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.65rem;
+  }
+
+  @media (max-width: 480px) {
+    .timer-presets-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .btn-timer-preset {
+    background: #1a1a1a;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.85rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    color: var(--text);
+  }
+
+  .btn-timer-preset:hover {
+    border-color: rgba(200, 169, 110, 0.5);
+    background: #202020;
+  }
+
+  .btn-timer-preset.active {
+    border-color: var(--accent);
+    background: rgba(200, 169, 110, 0.12);
+    box-shadow: 0 0 15px rgba(200, 169, 110, 0.15);
+  }
+
+  .preset-num {
+    font-family: var(--font-display);
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  .btn-timer-preset.active .preset-num {
+    color: var(--accent);
+  }
+
+  .preset-unit {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .preset-sub {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    opacity: 0.7;
+    margin-top: 0.15rem;
+  }
+
+  /* Custom input area */
+  .timer-custom-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.85rem;
+    background: #141414;
+    border: 1px dashed rgba(200, 169, 110, 0.35);
+    border-radius: 10px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .timer-custom-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .timer-custom-input-wrap input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.55rem 0.65rem;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    text-align: center;
+    outline: none;
+  }
+
+  .timer-custom-input-wrap input:focus {
+    border-color: var(--accent);
+  }
+
+  .custom-unit-tag {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    padding: 0 0.25rem;
+  }
+
+  .custom-step-btn {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .custom-step-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .lf-modal-footer {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .lf-modal-footer button {
+    flex: 1;
+  }
+
+  /* Completion Popup Modal */
+  .lf-modal-celebrate {
+    text-align: center;
+    align-items: center;
+    padding: 2.25rem 1.75rem;
+    border-color: var(--accent);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(200, 169, 110, 0.2);
+  }
+
+  .celebrate-icon {
+    font-size: 2.5rem;
+    color: var(--accent);
+    line-height: 1;
+    animation: spin-glow 2s infinite ease-in-out;
+  }
+
+  @keyframes spin-glow {
+    0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+    50% { transform: scale(1.15) rotate(15deg); opacity: 1; filter: drop-shadow(0 0 10px rgba(200, 169, 110, 0.6)); }
+  }
+
+  .celebrate-badge {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+  }
+
+  .celebrate-title {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    margin-top: 0.25rem;
+    line-height: 1.3;
+  }
+
+  .celebrate-desc {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: #c0b8ad;
+    max-width: 320px;
+    line-height: 1.5;
+  }
+
+  .celebrate-actions {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.65rem;
+    margin-top: 0.5rem;
+  }
+
+  .celebrate-actions button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
   }
 </style>
 </head>
@@ -822,8 +1344,11 @@
     <div class="panel-heading">
       <div class="logo">LineFlow</div>
       <div class="tagline">One line. Full presence.</div>
-      <div style="display: flex;">
-        <!-- <a target="_blank" class="tagline" style="margin-left: 20px; font-size: 0.7rem;" href="https://sahilrajput.com/lineflow/a-TODO">❤️ Planner</a> -->
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.25rem;">
+        <button type="button" class="btn-timer-trigger" id="btn-header-timer" title="Configure session timer">
+          <span class="timer-trigger-icon">⏱</span>
+          <span id="header-timer-label">Focus Timer</span>
+        </button>
         <a target="_blank" class="tagline" style="margin-left: auto; font-size: 0.7rem;" href="https://marketplace.visualstudio.com/items?itemName=SahilRajput.lineflow">🎉 VS Code Extension</a>
       </div>
     </div>
@@ -1086,6 +1611,102 @@
     </div>
   </section>
 </main>
+
+<!-- Global Floating Timer Widget -->
+<div id="floating-timer-widget" class="floating-timer-widget" role="region" aria-label="Global Focus Timer">
+  <div id="floating-timer-pill" class="floating-timer-pill" title="Click to configure timer">
+    <span class="timer-pill-dot" id="timer-pill-dot"></span>
+    <span class="timer-pill-time" id="timer-pill-time">Set Timer</span>
+    <button type="button" class="timer-pill-config-btn" id="btn-timer-pill-config" title="Timer Settings" aria-label="Timer Settings">⚙</button>
+  </div>
+  <button id="floating-timer-btn" class="floating-timer-btn" type="button" aria-label="Start, pause, or resume timer" title="Timer (Click to pause/resume or set)">
+    <svg class="timer-ring-svg" viewBox="0 0 56 56">
+      <circle class="timer-ring-track" cx="28" cy="28" r="23"></circle>
+      <circle class="timer-ring-indicator" id="timer-ring-indicator" cx="28" cy="28" r="23"></circle>
+    </svg>
+    <span class="timer-btn-icon" id="floating-timer-icon">⏱</span>
+  </button>
+</div>
+
+<!-- Timer Configuration Modal -->
+<div id="timer-modal" class="lf-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="timer-modal-title">
+  <div class="lf-modal-card">
+    <div class="lf-modal-header">
+      <div class="lf-modal-title-wrap">
+        <span class="lf-modal-badge">FOCUS SESSION</span>
+        <h2 id="timer-modal-title">Set Focus Timer</h2>
+      </div>
+      <button type="button" class="lf-modal-close" id="btn-timer-modal-close" aria-label="Close modal">✕</button>
+    </div>
+    
+    <!-- Active Session Banner if timer is running/paused -->
+    <div id="timer-active-banner" class="timer-active-banner hidden">
+      <div class="active-banner-info">
+        <span class="active-banner-label" id="timer-active-status">ACTIVE SESSION</span>
+        <span class="active-banner-time" id="timer-active-time">25:00</span>
+      </div>
+      <div class="active-banner-actions">
+        <button type="button" class="btn-secondary" id="btn-timer-banner-toggle" style="padding: 0.4rem 0.8rem; font-size: 0.6rem;">Pause</button>
+        <button type="button" class="text-btn" id="btn-timer-banner-reset" style="padding: 0.4rem 0.8rem; font-size: 0.6rem; color: var(--danger);">Reset</button>
+      </div>
+    </div>
+
+    <div class="timer-presets-label">Select Duration</div>
+    <div class="timer-presets-grid">
+      <button type="button" class="btn-timer-preset" data-minutes="10">
+        <span class="preset-num">10</span>
+        <span class="preset-unit">Mins</span>
+        <span class="preset-sub">Sprint</span>
+      </button>
+      <button type="button" class="btn-timer-preset active" data-minutes="25">
+        <span class="preset-num">25</span>
+        <span class="preset-unit">Mins</span>
+        <span class="preset-sub">Pomodoro</span>
+      </button>
+      <button type="button" class="btn-timer-preset" data-minutes="45">
+        <span class="preset-num">45</span>
+        <span class="preset-unit">Mins</span>
+        <span class="preset-sub">Deep Flow</span>
+      </button>
+      <button type="button" class="btn-timer-preset" data-preset="custom" id="btn-preset-custom">
+        <span class="preset-num">✎</span>
+        <span class="preset-unit">Custom</span>
+        <span class="preset-sub">Custom</span>
+      </button>
+    </div>
+
+    <!-- Custom Time Input Area -->
+    <div class="timer-custom-row hidden" id="timer-custom-container">
+      <label for="custom-timer-input" class="muted" style="letter-spacing: 0.15em; font-size: 0.7rem;">CUSTOM MINUTES</label>
+      <div class="timer-custom-input-wrap">
+        <button type="button" class="custom-step-btn" id="btn-custom-sub-5" title="-5 minutes">-5</button>
+        <input type="number" id="custom-timer-input" min="1" max="720" value="30" placeholder="Minutes">
+        <span class="custom-unit-tag">min</span>
+        <button type="button" class="custom-step-btn" id="btn-custom-add-5" title="+5 minutes">+5</button>
+      </div>
+    </div>
+
+    <div class="lf-modal-footer">
+      <button type="button" class="btn-start" id="btn-start-timer">Start Timer</button>
+      <button type="button" class="btn-secondary" id="btn-cancel-timer">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Timer Completed Popup Modal -->
+<div id="timer-completed-popup" class="lf-modal-backdrop hidden" role="alertdialog" aria-modal="true" aria-labelledby="timer-completed-title">
+  <div class="lf-modal-card lf-modal-celebrate">
+    <div class="celebrate-icon">✦</div>
+    <div class="celebrate-badge">SESSION COMPLETED</div>
+    <h2 id="timer-completed-title" class="celebrate-title">25 Mins Session Completed</h2>
+    <p class="celebrate-desc">Great presence! Take a mindful pause, hydrate, or jump right into your next flow.</p>
+    
+    <div class="celebrate-actions">
+      <button type="button" class="btn-start" id="btn-close-timer-popup">Close</button>
+      <button type="button" class="btn-secondary" id="btn-restart-timer-session">Repeat Session</button>
+    </div>
+  </div>
+</div>
 
 <div class="drag-indicator" id="drag-indicator">⬆</div>
 
@@ -1668,6 +2289,7 @@
   };
 
   const closeReaderPanel = () => {
+    document.body.classList.remove('in-reader-mode');
     const linesRead = getSessionLinesRead();
     if (linesRead !== 1) {
       alert(`Congrats you read ${linesRead} lines in this session 🎉`);
@@ -1692,6 +2314,7 @@
     state.currentReadingDocUserId = safeId(documentUserId) || null;
     state.currentReadingIntroAlertShown = false;
     state.sessionLinesRead = parsed.length ? 1 : 0;
+    document.body.classList.add('in-reader-mode');
     $('#control-panel').classList.add('hidden');
     $('#reader-panel').classList.remove('hidden');
     showScreen('reader');
@@ -2280,6 +2903,7 @@
     persistReadPosition();
   });
   dom.btnNew.addEventListener('click', () => {
+    document.body.classList.remove('in-reader-mode');
     $('#reader-panel').classList.add('hidden')
     $('#control-panel').classList.remove('hidden');
     dom.textInput.value = '';
@@ -2352,6 +2976,601 @@
     showSearchAndFeedPanels(true)
   })
 
+  // =========================================================
+  // GLOBAL FOCUS TIMER SYSTEM
+  // =========================================================
+  const TIMER_STORAGE_KEY = 'lineflow_timer_state_v1';
+  const CIRCLE_CIRCUMFERENCE = 144.513; // 2 * PI * 23
+
+  const timer = {
+    sessionMins: 25,
+    totalSeconds: 25 * 60,
+    remainingSeconds: 25 * 60,
+    status: 'idle', // 'idle' | 'running' | 'paused' | 'completed'
+    targetEndTime: null,
+    intervalId: null,
+    selectedPreset: 25,
+    customMinutes: 30
+  };
+
+  const timerDom = {
+    widget: null,
+    btn: null,
+    pill: null,
+    pillDot: null,
+    pillTime: null,
+    btnPillConfig: null,
+    icon: null,
+    ringIndicator: null,
+    modal: null,
+    modalClose: null,
+    activeBanner: null,
+    activeStatus: null,
+    activeTime: null,
+    bannerToggleBtn: null,
+    bannerResetBtn: null,
+    presetBtns: null,
+    customContainer: null,
+    customInput: null,
+    customSub5Btn: null,
+    customAdd5Btn: null,
+    startBtn: null,
+    cancelBtn: null,
+    headerTimerBtn: null,
+    headerTimerLabel: null,
+    completedPopup: null,
+    completedTitle: null,
+    completedCloseBtn: null,
+    completedRestartBtn: null
+  };
+
+  const formatTimerClock = totalSec => {
+    const s = Math.max(0, Math.floor(totalSec));
+    const mins = Math.floor(s / 60);
+    const secs = s % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  const playTimerChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+      const playTone = (freq, start, duration) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+        gain.gain.setValueAtTime(0.001, ctx.currentTime + start);
+        gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + start + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + start);
+        osc.stop(ctx.currentTime + start + duration);
+      };
+      playTone(587.33, 0, 0.6);        // D5
+      playTone(739.99, 0.16, 0.6);     // F#5
+      playTone(880.00, 0.32, 1.2);     // A5
+    } catch (e) {
+      // Audio might fail without recent gesture; ignore safely
+    }
+  };
+
+  const saveTimerState = () => {
+    try {
+      const data = {
+        sessionMins: timer.sessionMins,
+        totalSeconds: timer.totalSeconds,
+        remainingSeconds: timer.remainingSeconds,
+        status: timer.status,
+        targetEndTime: timer.targetEndTime,
+        selectedPreset: timer.selectedPreset,
+        customMinutes: timer.customMinutes
+      };
+      localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {}
+  };
+
+  const updateTimerUI = () => {
+    if (!timerDom.widget) return;
+    const formatted = formatTimerClock(timer.remainingSeconds);
+    const progress = timer.totalSeconds > 0 ? timer.remainingSeconds / timer.totalSeconds : 0;
+    const offset = CIRCLE_CIRCUMFERENCE * (1 - progress);
+
+    if (timerDom.ringIndicator) {
+      timerDom.ringIndicator.style.strokeDashoffset = String(offset);
+    }
+
+    if (timer.status === 'running') {
+      timerDom.btn.classList.add('running');
+      timerDom.btn.classList.remove('paused');
+      timerDom.btn.setAttribute('aria-label', 'Pause timer');
+      timerDom.btn.setAttribute('title', `Pause Timer (${formatted} left)`);
+      if (timerDom.icon) timerDom.icon.textContent = '❚❚';
+      if (timerDom.pillDot) {
+        timerDom.pillDot.className = 'timer-pill-dot running';
+      }
+      if (timerDom.pillTime) timerDom.pillTime.textContent = formatted;
+      if (timerDom.headerTimerLabel) {
+        timerDom.headerTimerLabel.textContent = `Timer: ${formatted}`;
+      }
+      document.title = `(${formatted}) LineFlow — One Line at a Time`;
+
+      // Active banner in modal
+      if (timerDom.activeBanner) {
+        timerDom.activeBanner.classList.remove('hidden');
+        if (timerDom.activeStatus) timerDom.activeStatus.textContent = 'RUNNING';
+        if (timerDom.activeTime) timerDom.activeTime.textContent = formatted;
+        if (timerDom.bannerToggleBtn) timerDom.bannerToggleBtn.textContent = 'Pause';
+      }
+    } else if (timer.status === 'paused') {
+      timerDom.btn.classList.remove('running');
+      timerDom.btn.classList.add('paused');
+      timerDom.btn.setAttribute('aria-label', 'Resume timer');
+      timerDom.btn.setAttribute('title', `Resume Timer (${formatted} left)`);
+      if (timerDom.icon) timerDom.icon.textContent = '▶';
+      if (timerDom.pillDot) {
+        timerDom.pillDot.className = 'timer-pill-dot paused';
+      }
+      if (timerDom.pillTime) timerDom.pillTime.textContent = `${formatted} (Paused)`;
+      if (timerDom.headerTimerLabel) {
+        timerDom.headerTimerLabel.textContent = `Paused: ${formatted}`;
+      }
+      document.title = `[Paused ${formatted}] LineFlow`;
+
+      // Active banner in modal
+      if (timerDom.activeBanner) {
+        timerDom.activeBanner.classList.remove('hidden');
+        if (timerDom.activeStatus) timerDom.activeStatus.textContent = 'PAUSED';
+        if (timerDom.activeTime) timerDom.activeTime.textContent = formatted;
+        if (timerDom.bannerToggleBtn) timerDom.bannerToggleBtn.textContent = 'Resume';
+      }
+    } else {
+      // Idle or completed
+      timerDom.btn.classList.remove('running', 'paused');
+      timerDom.btn.setAttribute('aria-label', 'Start focus timer');
+      timerDom.btn.setAttribute('title', 'Set Focus Timer');
+      if (timerDom.icon) timerDom.icon.textContent = '⏱';
+      if (timerDom.pillDot) {
+        timerDom.pillDot.className = 'timer-pill-dot';
+      }
+      if (timerDom.pillTime) {
+        timerDom.pillTime.textContent = timer.sessionMins ? `${timer.sessionMins}m Timer` : 'Set Timer';
+      }
+      if (timerDom.headerTimerLabel) {
+        timerDom.headerTimerLabel.textContent = 'Focus Timer';
+      }
+      if (timerDom.ringIndicator) {
+        timerDom.ringIndicator.style.strokeDashoffset = '0';
+      }
+      document.title = 'LineFlow — One Line at a Time';
+
+      if (timerDom.activeBanner) {
+        timerDom.activeBanner.classList.add('hidden');
+      }
+    }
+  };
+
+  const tickTimer = () => {
+    if (timer.status !== 'running' || !timer.targetEndTime) return;
+    const now = Date.now();
+    const remaining = Math.max(0, Math.ceil((timer.targetEndTime - now) / 1000));
+    timer.remainingSeconds = remaining;
+    updateTimerUI();
+
+    if (remaining <= 0) {
+      completeTimer();
+    }
+  };
+
+  const startTimer = minutes => {
+    const mins = Number(minutes);
+    if (!mins || isNaN(mins) || mins <= 0) return;
+
+    timer.sessionMins = mins;
+    timer.totalSeconds = Math.round(mins * 60);
+    timer.remainingSeconds = timer.totalSeconds;
+    timer.status = 'running';
+    timer.targetEndTime = Date.now() + timer.remainingSeconds * 1000;
+
+    if (timer.intervalId) clearInterval(timer.intervalId);
+    timer.intervalId = setInterval(tickTimer, 250);
+
+    // Request notification permission if not yet asked
+    if ('Notification' in window && Notification.permission === 'default') {
+      try { Notification.requestPermission().catch(() => {}); } catch (e) {}
+    }
+
+    updateTimerUI();
+    saveTimerState();
+  };
+
+  const pauseTimer = () => {
+    if (timer.status !== 'running') return;
+    if (timer.intervalId) {
+      clearInterval(timer.intervalId);
+      timer.intervalId = null;
+    }
+    if (timer.targetEndTime) {
+      timer.remainingSeconds = Math.max(0, Math.ceil((timer.targetEndTime - Date.now()) / 1000));
+    }
+    timer.status = 'paused';
+    timer.targetEndTime = null;
+    updateTimerUI();
+    saveTimerState();
+  };
+
+  const resumeTimer = () => {
+    if (timer.status !== 'paused' || timer.remainingSeconds <= 0) return;
+    timer.status = 'running';
+    timer.targetEndTime = Date.now() + timer.remainingSeconds * 1000;
+
+    if (timer.intervalId) clearInterval(timer.intervalId);
+    timer.intervalId = setInterval(tickTimer, 250);
+
+    updateTimerUI();
+    saveTimerState();
+  };
+
+  const toggleTimer = () => {
+    if (timer.status === 'running') {
+      pauseTimer();
+    } else if (timer.status === 'paused') {
+      resumeTimer();
+    } else {
+      openTimerModal();
+    }
+  };
+
+  const resetTimer = () => {
+    if (timer.intervalId) {
+      clearInterval(timer.intervalId);
+      timer.intervalId = null;
+    }
+    timer.status = 'idle';
+    timer.targetEndTime = null;
+    timer.totalSeconds = timer.sessionMins * 60;
+    timer.remainingSeconds = timer.totalSeconds;
+    updateTimerUI();
+    saveTimerState();
+  };
+
+  const completeTimer = () => {
+    if (timer.intervalId) {
+      clearInterval(timer.intervalId);
+      timer.intervalId = null;
+    }
+    timer.status = 'completed';
+    timer.remainingSeconds = 0;
+    timer.targetEndTime = null;
+    updateTimerUI();
+    saveTimerState();
+
+    playTimerChime();
+    if (navigator.vibrate) {
+      try { navigator.vibrate([200, 100, 200, 100, 300]); } catch (e) {}
+    }
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification('LineFlow Focus Completed', {
+          body: `${timer.sessionMins} Mins Session Completed 🎉`,
+          icon: '/manifest-assets/icon-192.png'
+        });
+      } catch (e) {}
+    }
+
+    showTimerCompletedPopup();
+  };
+
+  const showTimerCompletedPopup = () => {
+    if (timerDom.completedTitle) {
+      timerDom.completedTitle.textContent = `${timer.sessionMins} Mins Session Completed`;
+    }
+    if (timerDom.completedPopup) {
+      timerDom.completedPopup.classList.remove('hidden');
+    }
+  };
+
+  const closeTimerCompletedPopup = () => {
+    if (timerDom.completedPopup) {
+      timerDom.completedPopup.classList.add('hidden');
+    }
+    resetTimer();
+  };
+
+  const openTimerModal = () => {
+    if (!timerDom.modal) return;
+    selectPreset(timer.selectedPreset);
+    updateTimerUI();
+    timerDom.modal.classList.remove('hidden');
+  };
+
+  const closeTimerModal = () => {
+    if (timerDom.modal) {
+      timerDom.modal.classList.add('hidden');
+    }
+  };
+
+  const selectPreset = presetValue => {
+    timer.selectedPreset = presetValue;
+    if (timerDom.presetBtns) {
+      timerDom.presetBtns.forEach(btn => {
+        const mins = btn.getAttribute('data-minutes');
+        const isCustom = btn.getAttribute('data-preset') === 'custom';
+        if (presetValue === 'custom') {
+          btn.classList.toggle('active', isCustom);
+        } else {
+          btn.classList.toggle('active', String(mins) === String(presetValue));
+        }
+      });
+    }
+
+    if (timerDom.customContainer) {
+      if (presetValue === 'custom') {
+        timerDom.customContainer.classList.remove('hidden');
+        if (timerDom.customInput) {
+          timerDom.customInput.value = timer.customMinutes || 30;
+          timerDom.customInput.focus();
+        }
+      } else {
+        timerDom.customContainer.classList.add('hidden');
+      }
+    }
+  };
+
+  const setupFloatingDraggable = () => {
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let initLeft = 0;
+    let initTop = 0;
+    let hasMoved = false;
+
+    const onStart = e => {
+      if (e.button !== undefined && e.button !== 0) return;
+      hasMoved = false;
+      isDragging = true;
+      const clientX = e.clientX ?? (e.touches && e.touches[0].clientX);
+      const clientY = e.clientY ?? (e.touches && e.touches[0].clientY);
+      startX = clientX;
+      startY = clientY;
+      const rect = timerDom.widget.getBoundingClientRect();
+      initLeft = rect.left;
+      initTop = rect.top;
+    };
+
+    const onMove = e => {
+      if (!isDragging) return;
+      const clientX = e.clientX ?? (e.touches && e.touches[0].clientX);
+      const clientY = e.clientY ?? (e.touches && e.touches[0].clientY);
+      if (clientX === undefined || clientY === undefined) return;
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+
+      if (Math.hypot(dx, dy) > 6) {
+        hasMoved = true;
+        let newLeft = initLeft + dx;
+        let newTop = initTop + dy;
+        const maxLeft = window.innerWidth - timerDom.widget.offsetWidth - 12;
+        const maxTop = window.innerHeight - timerDom.widget.offsetHeight - 12;
+        newLeft = Math.max(12, Math.min(newLeft, maxLeft));
+        newTop = Math.max(12, Math.min(newTop, maxTop));
+
+        timerDom.widget.style.left = `${newLeft}px`;
+        timerDom.widget.style.top = `${newTop}px`;
+        timerDom.widget.style.right = 'auto';
+        timerDom.widget.style.bottom = 'auto';
+      }
+    };
+
+    const onEnd = () => {
+      isDragging = false;
+    };
+
+    timerDom.btn.addEventListener('pointerdown', onStart);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onEnd);
+    window.addEventListener('pointercancel', onEnd);
+
+    // Click handler that checks hasMoved
+    timerDom.btn.addEventListener('click', e => {
+      if (hasMoved) {
+        hasMoved = false;
+        return;
+      }
+      toggleTimer();
+    });
+  };
+
+  const initTimer = () => {
+    timerDom.widget = $('#floating-timer-widget');
+    timerDom.btn = $('#floating-timer-btn');
+    timerDom.pill = $('#floating-timer-pill');
+    timerDom.pillDot = $('#timer-pill-dot');
+    timerDom.pillTime = $('#timer-pill-time');
+    timerDom.btnPillConfig = $('#btn-timer-pill-config');
+    timerDom.icon = $('#floating-timer-icon');
+    timerDom.ringIndicator = $('#timer-ring-indicator');
+    timerDom.modal = $('#timer-modal');
+    timerDom.modalClose = $('#btn-timer-modal-close');
+    timerDom.activeBanner = $('#timer-active-banner');
+    timerDom.activeStatus = $('#timer-active-status');
+    timerDom.activeTime = $('#timer-active-time');
+    timerDom.bannerToggleBtn = $('#btn-timer-banner-toggle');
+    timerDom.bannerResetBtn = $('#btn-timer-banner-reset');
+    timerDom.presetBtns = $$('.btn-timer-preset');
+    timerDom.customContainer = $('#timer-custom-container');
+    timerDom.customInput = $('#custom-timer-input');
+    timerDom.customSub5Btn = $('#btn-custom-sub-5');
+    timerDom.customAdd5Btn = $('#btn-custom-add-5');
+    timerDom.startBtn = $('#btn-start-timer');
+    timerDom.cancelBtn = $('#btn-cancel-timer');
+    timerDom.headerTimerBtn = $('#btn-header-timer');
+    timerDom.headerTimerLabel = $('#header-timer-label');
+    timerDom.completedPopup = $('#timer-completed-popup');
+    timerDom.completedTitle = $('#timer-completed-title');
+    timerDom.completedCloseBtn = $('#btn-close-timer-popup');
+    timerDom.completedRestartBtn = $('#btn-restart-timer-session');
+
+    if (!timerDom.widget || !timerDom.btn) return;
+
+    setupFloatingDraggable();
+
+    // Click pill to open timer modal
+    timerDom.pill?.addEventListener('click', () => {
+      openTimerModal();
+    });
+
+    timerDom.btnPillConfig?.addEventListener('click', e => {
+      e.stopPropagation();
+      openTimerModal();
+    });
+
+    // Header button
+    timerDom.headerTimerBtn?.addEventListener('click', () => {
+      openTimerModal();
+    });
+
+    // Modal close & cancel
+    timerDom.modalClose?.addEventListener('click', closeTimerModal);
+    timerDom.cancelBtn?.addEventListener('click', closeTimerModal);
+    timerDom.modal?.addEventListener('click', e => {
+      if (e.target === timerDom.modal) closeTimerModal();
+    });
+
+    // Active banner controls inside modal
+    timerDom.bannerToggleBtn?.addEventListener('click', () => {
+      toggleTimer();
+    });
+    timerDom.bannerResetBtn?.addEventListener('click', () => {
+      resetTimer();
+    });
+
+    // Presets
+    timerDom.presetBtns?.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mins = btn.getAttribute('data-minutes');
+        if (mins) {
+          selectPreset(Number(mins));
+        } else if (btn.getAttribute('data-preset') === 'custom') {
+          selectPreset('custom');
+        }
+      });
+    });
+
+    // Custom steps
+    timerDom.customSub5Btn?.addEventListener('click', () => {
+      const cur = parseInt(timerDom.customInput.value, 10) || 30;
+      const nextVal = Math.max(1, cur - 5);
+      timerDom.customInput.value = nextVal;
+      timer.customMinutes = nextVal;
+    });
+
+    timerDom.customAdd5Btn?.addEventListener('click', () => {
+      const cur = parseInt(timerDom.customInput.value, 10) || 30;
+      const nextVal = Math.min(720, cur + 5);
+      timerDom.customInput.value = nextVal;
+      timer.customMinutes = nextVal;
+    });
+
+    timerDom.customInput?.addEventListener('input', e => {
+      const val = parseInt(e.target.value, 10);
+      if (val && !isNaN(val)) {
+        timer.customMinutes = Math.max(1, Math.min(720, val));
+      }
+    });
+
+    // Start timer from modal
+    timerDom.startBtn?.addEventListener('click', () => {
+      let durationMins;
+      if (timer.selectedPreset === 'custom') {
+        const val = parseInt(timerDom.customInput.value, 10);
+        if (!val || isNaN(val) || val < 1) {
+          alert('Please enter a valid time of at least 1 minute.');
+          timerDom.customInput?.focus();
+          return;
+        }
+        durationMins = Math.min(720, val);
+        timer.customMinutes = durationMins;
+      } else {
+        durationMins = Number(timer.selectedPreset) || 25;
+      }
+      startTimer(durationMins);
+      closeTimerModal();
+    });
+
+    // Completion popup
+    timerDom.completedCloseBtn?.addEventListener('click', closeTimerCompletedPopup);
+    timerDom.completedRestartBtn?.addEventListener('click', () => {
+      const prevMins = timer.sessionMins || 25;
+      closeTimerCompletedPopup();
+      startTimer(prevMins);
+    });
+
+    // ESC to close modal
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (timerDom.completedPopup && !timerDom.completedPopup.classList.contains('hidden')) {
+          closeTimerCompletedPopup();
+        } else if (timerDom.modal && !timerDom.modal.classList.contains('hidden')) {
+          closeTimerModal();
+        }
+      }
+    });
+
+    // Load saved state
+    try {
+      const raw = localStorage.getItem(TIMER_STORAGE_KEY);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data && data.sessionMins) {
+          timer.sessionMins = data.sessionMins;
+          timer.totalSeconds = data.totalSeconds || data.sessionMins * 60;
+          timer.selectedPreset = data.selectedPreset || 25;
+          timer.customMinutes = data.customMinutes || 30;
+
+          if (data.status === 'running' && data.targetEndTime) {
+            const now = Date.now();
+            const remaining = Math.ceil((data.targetEndTime - now) / 1000);
+            if (remaining <= 0) {
+              timer.status = 'completed';
+              timer.remainingSeconds = 0;
+              timer.targetEndTime = null;
+              updateTimerUI();
+              showTimerCompletedPopup();
+            } else {
+              timer.remainingSeconds = remaining;
+              timer.status = 'running';
+              timer.targetEndTime = data.targetEndTime;
+              timer.intervalId = setInterval(tickTimer, 250);
+              updateTimerUI();
+            }
+          } else if (data.status === 'paused') {
+            timer.status = 'paused';
+            timer.remainingSeconds = data.remainingSeconds || data.totalSeconds;
+            timer.targetEndTime = null;
+            updateTimerUI();
+          } else {
+            timer.status = 'idle';
+            timer.remainingSeconds = timer.totalSeconds;
+            updateTimerUI();
+          }
+        } else {
+          updateTimerUI();
+        }
+      } else {
+        updateTimerUI();
+      }
+    } catch (e) {
+      updateTimerUI();
+    }
+  };
+
   const init = () => {
     loadReaderFontSize();
     applyReaderFontSize();
@@ -2370,6 +3589,7 @@
     dom.btnShowCreate.disabled = false;
 
     dom.textInput.value = isDev ? 'This line one. This is line two.': ''
+    initTimer();
   };
 
   init();
