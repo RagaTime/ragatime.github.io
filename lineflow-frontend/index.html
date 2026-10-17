@@ -504,6 +504,49 @@
   .line-text.enter-from-below { animation: enterFromBelow 0.09s ease forwards; }
   .line-text.enter-from-above { animation: enterFromAbove 0.09s ease forwards; }
 
+  .reader-copy-control {
+    position: absolute;
+    top: 75%;
+    right: 0.75rem;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transform: translateY(-50%);
+  }
+
+  .reader-copy-btn {
+    padding: 0.35rem 0.45rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+  }
+
+  .reader-copy-btn:active {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .reader-copy-status {
+    padding: 0.3rem 0.45rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    white-space: nowrap;
+  }
+
+  .reader-copy-status.hidden {
+    display: none;
+  }
+
   .accent-line {
     width: 2.5rem;
     height: 1px;
@@ -1581,6 +1624,10 @@
             <div class="reader-font-size" id="reader-font-size-label">1.5rem</div>
           </div>
         </div>
+        <div class="reader-copy-control">
+          <span class="reader-copy-status hidden" id="reader-copy-status" role="status" aria-live="polite"></span>
+          <button class="reader-copy-btn" id="btn-copy-line" type="button">Copy</button>
+        </div>
         <div class="reading-zone" id="reading-zone">
           <div class="line-display">
             <div class="line-number-badge" id="line-badge">LINE 1</div>
@@ -1728,12 +1775,14 @@
     const $ = document.querySelector.bind(document);
     const $$ = document.querySelectorAll.bind(document); // optional for multiple elements
 
-  // const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.');
-  const isDev = false;
+  const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.');
+  // const isDev = false;
+
   const API_HOST = `https://api${isDev ? "-dev": ""}.mypot.in`;
   // Note: I am using localhost instead of api-dev.mypot.in for
   //       development until my broadband starts working again.
   // const API_HOST = isDev ? `http://localhost:8080`: `https://api.mypot.in`;
+
   const API_SLUG = '/api/v1/line-flow'
   const API_BASE = API_HOST + API_SLUG
 
@@ -1812,6 +1861,8 @@
     btnFontReset: $('#btn-font-reset'),
     btnFontDecrease: $('#btn-font-decrease'),
     readerFontSizeLabel: $('#reader-font-size-label'),
+    btnCopyLine: $('#btn-copy-line'),
+    readerCopyStatus: $('#reader-copy-status'),
     btnRestart: $('#btn-restart'),
     btnNew: $('#btn-new'),
     readingZone: $('#reading-zone'),
@@ -2372,6 +2423,29 @@
     }, 90);
   };
 
+  let readerCopyStatusTimeoutId;
+  const showReaderCopyStatus = message => {
+    dom.readerCopyStatus.textContent = message;
+    dom.readerCopyStatus.classList.remove('hidden');
+    clearTimeout(readerCopyStatusTimeoutId);
+    readerCopyStatusTimeoutId = setTimeout(() => {
+      dom.readerCopyStatus.classList.add('hidden');
+    }, 1600);
+  };
+
+  const copyCurrentLine = async () => {
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error('Clipboard access is not available');
+      }
+      await navigator.clipboard.writeText(dom.lineText.textContent);
+      showReaderCopyStatus('Copied!');
+    } catch (error) {
+      console.error('Could not copy the current line', error);
+      showReaderCopyStatus('Copy failed');
+    }
+  };
+
   const showDone = () => {
     const elapsed = Math.round((Date.now() - state.startTime) / 1000);
     const mins = Math.floor(elapsed / 60);
@@ -2898,6 +2972,7 @@
 
   dom.btnPrev.addEventListener('click', goPrev);
   dom.btnNext.addEventListener('click', goNext);
+  dom.btnCopyLine.addEventListener('click', copyCurrentLine);
   dom.btnFontIncrease.addEventListener('click', increaseReaderFontSize);
   dom.btnFontReset.addEventListener('click', resetReaderFontSize);
   dom.btnFontDecrease.addEventListener('click', decreaseReaderFontSize);
