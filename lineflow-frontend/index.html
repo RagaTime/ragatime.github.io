@@ -1778,7 +1778,7 @@
   const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.');
   // const isDev = false;
 
-  const API_HOST = `https://api${!isDev ? "-dev": ""}.mypot.in`;
+  const API_HOST = `https://api${isDev ? "-dev": ""}.mypot.in`;
   // Note: I am using localhost instead of api-dev.mypot.in for
   //       development until my broadband starts working again.
   // const API_HOST = isDev ? `http://localhost:8080`: `https://api.mypot.in`;
@@ -2827,16 +2827,21 @@
     }
   };
 
+  let isSendingRegistrationOtp = false;
   const handleSendOtp = async () => {
-    const name = dom.signupName.value.trim();
-    const username = dom.signupUsername.value.trim();
-    const email = dom.signupEmail.value.trim();
-    if (!name || !username || !email) {
-      setFeedback(dom.authFeedback, 'Enter name, username, and email.', 'error');
-      return;
-    }
-    setFeedback(dom.authFeedback, 'Sending OTP…', 'info');
+    if (isSendingRegistrationOtp) return;
+
+    isSendingRegistrationOtp = true;
+    dom.btnSendOtp.disabled = true;
     try {
+      const name = dom.signupName.value.trim();
+      const username = dom.signupUsername.value.trim();
+      const email = dom.signupEmail.value.trim();
+      if (!name || !username || !email) {
+        setFeedback(dom.authFeedback, 'Enter name, username, and email.', 'error');
+        return;
+      }
+      setFeedback(dom.authFeedback, 'Sending OTP…', 'info');
       await apiRequest('/users/create', { method: 'POST', body: { name, username, email } });
       state.pendingUsernameOrEmail = username;
       dom.otpUsernameDisplay.textContent = username;
@@ -2845,6 +2850,9 @@
       setFeedback(dom.authFeedback, 'OTP sent. Enter the code below.', 'success');
     } catch (error) {
       setFeedback(dom.authFeedback, error.message, 'error');
+    } finally {
+      isSendingRegistrationOtp = false;
+      dom.btnSendOtp.disabled = false;
     }
   };
 
