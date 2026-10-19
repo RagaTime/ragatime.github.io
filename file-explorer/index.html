@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>File Explorer</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="File Explorer home">
+        <span class="brand-mark" aria-hidden="true">F</span>
+        <span>File Explorer</span>
+      </a>
+      <span class="security-note">Connection details are saved for this tab</span>
+    </header>
+
+    <section class="connection-card" aria-labelledby="connection-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">CONNECTION</p>
+          <h2 id="connection-title">SFTP server</h2>
+        </div>
+        <div class="connection-header-actions">
+          <span id="connection-status" class="status-pill" role="status">Not connected</span>
+          <span id="connected-account" class="connected-account hidden" role="status"></span>
+          <button class="button button-outline hidden" id="connection-disconnect-button" type="button">Disconnect</button>
+        </div>
+      </div>
+
+      <form id="connection-form">
+        <div class="form-grid">
+          <label class="field field-host">
+            <span>Host</span>
+            <input name="host" autocomplete="url" placeholder="sftp.example.com" required>
+          </label>
+          <label class="field field-port">
+            <span>Port</span>
+            <input name="port" type="number" min="1" max="65535" value="22" required>
+          </label>
+          <label class="field field-user">
+            <span>Username</span>
+            <input name="username" autocomplete="username" required>
+          </label>
+          <label class="field field-method">
+            <span>Authentication</span>
+            <select name="authMethod" id="auth-method">
+              <option value="password">Password</option>
+              <option value="privateKey">Private key</option>
+            </select>
+          </label>
+          <label class="field field-password" id="password-field">
+            <span>Password</span>
+            <input name="password" type="password" autocomplete="current-password">
+          </label>
+          <label class="field field-key hidden" id="private-key-field">
+            <span>Private key</span>
+            <textarea name="privateKey" rows="3" autocomplete="off" spellcheck="false" placeholder="Paste your private key"></textarea>
+          </label>
+          <label class="field field-passphrase hidden" id="passphrase-field">
+            <span>Key passphrase <span class="optional">(optional)</span></span>
+            <input name="passphrase" type="password" autocomplete="off">
+          </label>
+        </div>
+        <div class="connection-actions">
+          <p class="helper-text">Credentials are kept in this tab's session storage for automatic reconnect. Disconnect clears them.</p>
+          <div class="connection-buttons">
+            <button class="button button-quiet" id="fill-sample-button" type="button">Fill sample</button>
+            <button class="button button-primary" id="connect-button" type="submit">Connect</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section id="browser-panel" class="browser-card hidden" aria-labelledby="browser-title">
+      <div class="browser-heading">
+        <div>
+          <p class="eyebrow">SFTP FILE SYSTEM</p>
+          <h2 id="browser-title">Browse files</h2>
+        </div>
+        <div class="toolbar">
+          <button class="button button-quiet" id="refresh-button" type="button" title="Reload the current folder from the server">↻ <span>Refresh</span></button>
+          <button class="button button-quiet" id="new-folder-button" type="button">＋ <span>Folder</span></button>
+          <button class="button button-quiet" id="new-file-button" type="button">＋ <span>File</span></button>
+          <button class="button button-quiet" id="upload-button" type="button">↑ <span>Upload</span></button>
+          <input id="upload-input" type="file" hidden multiple>
+        </div>
+      </div>
+
+      <nav id="breadcrumbs" class="breadcrumbs" aria-label="Current folder"></nav>
+      <div id="browser-message" class="inline-message hidden" role="status"></div>
+      <div class="file-list-wrap">
+        <table class="file-list">
+          <thead>
+            <tr><th scope="col">Name</th><th scope="col">Modified</th><th scope="col">Size</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr>
+          </thead>
+          <tbody id="file-list"></tbody>
+        </table>
+        <div id="empty-state" class="empty-state hidden">
+          <span class="empty-icon" aria-hidden="true">□</span>
+          <strong>This folder is empty</strong>
+          <span>Create a file or folder to get started.</span>
+        </div>
+      </div>
+    </section>
+
+    <p id="app-message" class="app-message" role="status" aria-live="polite"></p>
+    <footer>Connected files are served directly by your SFTP server. Refresh to fetch the latest remote version.</footer>
+  </main>
+
+  <dialog id="editor-dialog" class="editor-dialog">
+    <form method="dialog" class="dialog-close-form">
+      <button class="icon-button" aria-label="Close editor" value="cancel">×</button>
+    </form>
+    <div class="editor-heading">
+      <div>
+        <p class="eyebrow" id="editor-mode">TEXT FILE</p>
+        <h2 id="editor-title">Edit file</h2>
+      </div>
+      <div class="editor-toolbar">
+        <button class="button button-quiet" id="reload-file-button" type="button">↻ <span>Reload from server</span></button>
+        <button class="button button-quiet" id="download-file-button" type="button">↓ <span>Download</span></button>
+      </div>
+    </div>
+    <div id="editor-message" class="inline-message hidden" role="status"></div>
+    <label class="field editor-content-field">
+      <span class="visually-hidden">File contents</span>
+      <textarea id="file-content" spellcheck="false" autocomplete="off"></textarea>
+    </label>
+    <div class="dialog-actions">
+      <button class="button button-outline" id="cancel-editor-button" type="button">Cancel</button>
+      <button class="button button-primary" id="save-file-button" type="button">Save changes</button>
+    </div>
+  </dialog>
+</body>
+</html>

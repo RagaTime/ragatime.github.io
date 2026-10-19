@@ -2886,18 +2886,23 @@
     }
   });
 
+  let isVerifyingOtp = false;
   const handleVerifyOtp = async () => {
-    const otp = dom.otpValue.value.trim();
-    if (!state.pendingUsernameOrEmail) {
-      setFeedback(dom.authFeedback, 'Send OTP before verifying.', 'error');
-      return;
-    }
-    if (!otp) {
-      setFeedback(dom.authFeedback, 'Enter the OTP.', 'error');
-      return;
-    }
-    setFeedback(dom.authFeedback, 'Verifying…', 'info');
+    if (isVerifyingOtp) return;
+
+    isVerifyingOtp = true;
+    dom.btnVerifyOtp.disabled = true;
     try {
+      const otp = dom.otpValue.value.trim();
+      if (!state.pendingUsernameOrEmail) {
+        setFeedback(dom.authFeedback, 'Send OTP before verifying.', 'error');
+        return;
+      }
+      if (!otp) {
+        setFeedback(dom.authFeedback, 'Enter the OTP.', 'error');
+        return;
+      }
+      setFeedback(dom.authFeedback, 'Verifying…', 'info');
       const data = await apiRequest('/users/verify-otp', { method: 'POST', body: { usernameOrEmail: state.pendingUsernameOrEmail, otp: Number(otp) } });
       const user = {
         userId: safeId(data.data.user.userId),
@@ -2915,6 +2920,9 @@
       hideAuthScreens();
     } catch (error) {
       setFeedback(dom.authFeedback, error.message, 'error');
+    } finally {
+      isVerifyingOtp = false;
+      dom.btnVerifyOtp.disabled = false;
     }
   };
 
