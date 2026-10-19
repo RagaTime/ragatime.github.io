@@ -28,6 +28,7 @@ let activeFilePath = ''
 let forceTextMode = false
 let originalContents = ''
 let activeConnection
+let saveFeedbackTimer
 
 const moreActionsIcon = '<svg class="more-actions-icon" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>'
 
@@ -535,8 +536,8 @@ document.querySelector('#reload-file-button').addEventListener('click', async ()
   }
 })
 
-document.querySelector('#rename-file-button').addEventListener('click', async event => {
-  event.currentTarget.closest('.action-menu')?.removeAttribute('open')
+async function renameOpenFile(button) {
+  button.closest('.action-menu')?.removeAttribute('open')
   const currentName = activeFilePath.split('/').at(-1)
   const newName = window.prompt('Rename to', currentName)
   if (!newName?.trim() || newName.trim() === currentName) return
@@ -546,7 +547,6 @@ document.querySelector('#rename-file-button').addEventListener('click', async ev
     return
   }
 
-  const button = event.currentTarget
   button.disabled = true
   try {
     const parentPath = activeFilePath.slice(0, activeFilePath.lastIndexOf('/')) || '/'
@@ -566,6 +566,14 @@ document.querySelector('#rename-file-button').addEventListener('click', async ev
   } finally {
     button.disabled = false
   }
+}
+
+document.querySelector('#rename-file-button').addEventListener('click', event => {
+  renameOpenFile(event.currentTarget)
+})
+
+editorTitle.addEventListener('click', event => {
+  renameOpenFile(event.currentTarget)
 })
 
 document.querySelector('#delete-file-button').addEventListener('click', async event => {
@@ -593,6 +601,8 @@ document.querySelector('#delete-file-button').addEventListener('click', async ev
 document.querySelector('#save-file-button').addEventListener('click', async () => {
   const button = document.querySelector('#save-file-button')
   button.disabled = true
+  button.classList.remove('saved')
+  clearTimeout(saveFeedbackTimer)
   try {
     await request('/text-file', {
       method: 'PUT',
@@ -600,7 +610,8 @@ document.querySelector('#save-file-button').addEventListener('click', async () =
       body: JSON.stringify({ path: activeFilePath, content: editorContent.value })
     })
     originalContents = editorContent.value
-    showMessage(editorMessage, 'Saved.', true)
+    button.classList.add('saved')
+    saveFeedbackTimer = setTimeout(() => button.classList.remove('saved'), 1000)
     await loadDirectory(currentPath)
   } catch (error) {
     showMessage(editorMessage, error.message)
