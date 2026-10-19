@@ -25,7 +25,8 @@ The backend's existing CORS configuration already permits `http://localhost:5173
 
 ## Features
 
-- Browse folders, create an empty file that opens immediately in the editor, create folders, click a file to edit it as text, rename or delete entries, and upload/download files.
+- Browse folders, create an empty file that opens immediately in the editor, create folders, click a file to edit it as text, rename or delete files from the editor or file list, and upload/download files.
+- Use the three-dot action menu in the file list or editor to rename, download, or delete files.
 - Refresh a folder or reload an open text file to fetch the latest remote contents. Requests use `Cache-Control: no-store`.
 - After automatic reconnect, restores the last opened folder and reopens the last file if its editor was open when the page was reloaded.
 - Connect with an SFTP password or pasted private key. The last successful connection details, including credentials, are stored in tab-scoped `sessionStorage` so a page reload can reconnect automatically. This browser storage is not encrypted and is readable by scripts running on this origin. Disconnect clears the saved details; closing the tab ends the browser session.

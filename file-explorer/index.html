@@ -4,30 +4,33 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#111827">
-  <title>File Explorer</title>
+  <title>SFTP File Explorer</title>
   <link rel="stylesheet" href="./styles.css">
   <script src="./app.js" defer></script>
 </head>
 <body>
   <main class="app-shell">
     <header class="topbar">
-      <a class="brand" href="./" aria-label="File Explorer home">
+      <a class="brand" href="./" aria-label="SFTP File Explorer home">
         <span class="brand-mark" aria-hidden="true">F</span>
-        <span>File Explorer</span>
+        <span>SFTP File Explorer</span>
       </a>
       <span class="security-note">Connection details are saved for this tab</span>
+      <div id="connected-controls" class="connected-controls hidden">
+        <span id="connected-account" class="connected-account" role="status"></span>
+        <button class="button button-outline disconnect-icon-button" id="connection-disconnect-button" type="button" aria-label="Disconnect" title="Disconnect">
+          <svg class="disconnect-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M7.05 5.7a9 9 0 1 0 9.9 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
     </header>
 
-    <section class="connection-card" aria-labelledby="connection-title">
+    <section class="connection-card" aria-label="SFTP connection">
       <div class="section-heading">
-        <div>
-          <p class="eyebrow">CONNECTION</p>
-          <h2 id="connection-title">SFTP server</h2>
-        </div>
         <div class="connection-header-actions">
           <span id="connection-status" class="status-pill" role="status">Not connected</span>
-          <span id="connected-account" class="connected-account hidden" role="status"></span>
-          <button class="button button-outline hidden" id="connection-disconnect-button" type="button">Disconnect</button>
         </div>
       </div>
 
@@ -75,12 +78,8 @@
       </form>
     </section>
 
-    <section id="browser-panel" class="browser-card hidden" aria-labelledby="browser-title">
+    <section id="browser-panel" class="browser-card hidden" aria-label="File browser">
       <div class="browser-heading">
-        <div>
-          <p class="eyebrow">SFTP FILE SYSTEM</p>
-          <h2 id="browser-title">Browse files</h2>
-        </div>
         <div class="toolbar">
           <button class="button button-quiet" id="refresh-button" type="button" title="Reload the current folder from the server">↻ <span>Refresh</span></button>
           <button class="button button-quiet" id="new-folder-button" type="button">＋ <span>Folder</span></button>
@@ -91,7 +90,7 @@
       </div>
 
       <nav id="breadcrumbs" class="breadcrumbs" aria-label="Current folder"></nav>
-      <div id="browser-message" class="inline-message hidden" role="status"></div>
+      <div id="browser-message" class="browser-status" role="status"></div>
       <div class="file-list-wrap">
         <table class="file-list">
           <thead>
@@ -117,12 +116,24 @@
     </form>
     <div class="editor-heading">
       <div>
-        <p class="eyebrow" id="editor-mode">TEXT FILE</p>
         <h2 id="editor-title">Edit file</h2>
       </div>
       <div class="editor-toolbar">
-        <button class="button button-quiet" id="reload-file-button" type="button">↻ <span>Reload from server</span></button>
-        <button class="button button-quiet" id="download-file-button" type="button">↓ <span>Download</span></button>
+        <button class="button button-quiet" id="reload-file-button" type="button" aria-label="Reload file from server" title="Reload file">
+          <span class="reload-file-icon" aria-hidden="true">↻</span>
+          <span class="reload-spinner" aria-hidden="true"></span>
+        </button>
+        <details class="action-menu editor-action-menu">
+          <summary class="action-menu-trigger" aria-label="More file actions" title="More file actions">
+            <svg class="more-actions-icon" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+          </summary>
+          <div class="action-menu-items">
+            <button class="action-menu-item" id="rename-file-button" type="button">Rename</button>
+            <button class="action-menu-item" id="download-file-button" type="button">Download</button>
+            <button class="action-menu-item danger" id="delete-file-button" type="button">Delete</button>
+          </div>
+        </details>
+        <button class="button button-primary" id="save-file-button" type="button">Save</button>
       </div>
     </div>
     <div id="editor-message" class="inline-message hidden" role="status"></div>
@@ -130,10 +141,6 @@
       <span class="visually-hidden">File contents</span>
       <textarea id="file-content" spellcheck="false" autocomplete="off"></textarea>
     </label>
-    <div class="dialog-actions">
-      <button class="button button-outline" id="cancel-editor-button" type="button">Cancel</button>
-      <button class="button button-primary" id="save-file-button" type="button">Save changes</button>
-    </div>
   </dialog>
 </body>
 </html>

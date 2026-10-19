@@ -14,9 +14,12 @@ const emptyState = document.querySelector('#empty-state')
 const editorDialog = document.querySelector('#editor-dialog')
 const editorMessage = document.querySelector('#editor-message')
 const editorTitle = document.querySelector('#editor-title')
-const editorMode = document.querySelector('#editor-mode')
 const editorContent = document.querySelector('#file-content')
 const uploadInput = document.querySelector('#upload-input')
+
+editorDialog.addEventListener('mousedown', event => {
+  if (event.target.closest('button, summary')) event.preventDefault()
+})
 
 let sessionToken = ''
 let homePath = ''
@@ -26,10 +29,13 @@ let forceTextMode = false
 let originalContents = ''
 let activeConnection
 
+const moreActionsIcon = '<svg class="more-actions-icon" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>'
+
 function showMessage(element, message, success = false) {
-  element.textContent = message
-  element.classList.toggle('hidden', !message)
+  element.textContent = element === browserMessage && !message ? '\u00a0' : message
+  if (element !== browserMessage) element.classList.toggle('hidden', !message)
   element.classList.toggle('success', success)
+  element.classList.toggle('loading', element === editorMessage && message === 'Loading file…')
 }
 
 function apiUrl(endpoint, query = {}) {
@@ -115,20 +121,25 @@ function renderEntries(entries) {
         <span class="file-icon${entry.isDirectory ? ' directory' : ''}" aria-hidden="true">${icon}</span>
         <span class="file-label">${name}</span>
       </button></td>
-      <td>${modified}</td>
-      <td>${size}</td>
+      <td><button class="file-meta-button" type="button" aria-label="Open ${name}, modified ${modified}" data-action="edit-text" data-path="${path}" data-name="${name}">${modified}<span class="mobile-file-size">${size}</span></button></td>
+      <td><button class="file-meta-button file-size-button" type="button" aria-label="Open ${name}, size ${size}" data-action="edit-text" data-path="${path}" data-name="${name}">${size}</button></td>
       <td><div class="row-actions">
-        ${entry.isDirectory ? '' : `<button class="row-action" type="button" data-action="download" data-path="${path}" data-name="${name}">Download</button>`}
-        <button class="row-action" type="button" data-action="rename" data-path="${path}" data-name="${name}">Rename</button>
-        <button class="row-action danger" type="button" data-action="delete" data-path="${path}" data-name="${name}" data-directory="${entry.isDirectory}">Delete</button>
+        <details class="action-menu row-action-menu">
+          <summary class="action-menu-trigger" aria-label="More actions for ${name}" title="More actions">${moreActionsIcon}</summary>
+          <div class="action-menu-items">
+            <button class="action-menu-item" type="button" data-action="rename" data-path="${path}" data-name="${name}">Rename</button>
+            ${entry.isDirectory ? '' : `<button class="action-menu-item" type="button" data-action="download" data-path="${path}" data-name="${name}">Download</button>`}
+            <button class="action-menu-item danger" type="button" data-action="delete" data-path="${path}" data-name="${name}" data-directory="${entry.isDirectory}">Delete</button>
+          </div>
+        </details>
       </div></td>
     </tr>`
   }).join('')
   emptyState.classList.toggle('hidden', sorted.length !== 0)
 }
 
-async function loadDirectory(path = currentPath, silent = false) {
-  if (!silent) showMessage(browserMessage, '')
+async function loadDirectory(path = currentPath) {
+  showMessage(browserMessage, 'Loading…')
   const refreshButton = document.querySelector('#refresh-button')
   refreshButton.disabled = true
   try {
@@ -138,7 +149,13 @@ async function loadDirectory(path = currentPath, silent = false) {
     renderBreadcrumbs()
     renderEntries(entries)
     saveLastView(path)
-    showMessage(browserMessage, `Loaded ${entries.length} ${entries.length === 1 ? 'entry' : 'entries'} from the server.`, true)
+    const folderCount = entries.filter(entry => entry.isDirectory).length
+    const fileCount = entries.length - folderCount
+    showMessage(
+      browserMessage,
+      `${folderCount} ${folderCount === 1 ? 'folder' : 'folders'}, ${fileCount} ${fileCount === 1 ? 'file' : 'files'}`,
+      true
+    )
     return true
   } catch (error) {
     showMessage(browserMessage, error.message)
@@ -150,14 +167,15 @@ async function loadDirectory(path = currentPath, silent = false) {
 
 function setConnected(connected) {
   browserPanel.classList.toggle('hidden', !connected)
+  document.querySelector('.connection-card').classList.toggle('hidden', connected)
   form.classList.toggle('hidden', connected)
-  connectionStatus.classList.toggle('connected', connected)
-  connectionStatus.classList.toggle('hidden', connected)
+  connectionStatus.classList.toggle('connected', false)
   connectionStatus.textContent = 'Not connected'
+  document.querySelector('.security-note').classList.toggle('hidden', connected)
+  const connectedControls = document.querySelector('#connected-controls')
+  connectedControls.classList.toggle('hidden', !connected)
   const account = document.querySelector('#connected-account')
   account.textContent = connected ? `${form.elements.username.value}@${form.elements.host.value}` : ''
-  account.classList.toggle('hidden', !connected)
-  document.querySelector('#connection-disconnect-button').classList.toggle('hidden', !connected)
   document.querySelector('#connect-button').textContent = 'Connect'
   document.querySelector('#connect-button').disabled = connected
 }
@@ -345,11 +363,12 @@ breadcrumbs.addEventListener('click', event => {
 fileList.addEventListener('click', async event => {
   const button = event.target.closest('[data-action]')
   if (!button) return
+  button.closest('.action-menu')?.removeAttribute('open')
   const { action, path, name } = button.dataset
   if (action === 'open') return loadDirectory(path)
   if (action === 'edit') return openEditor(path, name)
   if (action === 'edit-text') return openEditor(path, name, true)
-  if (action === 'download') return downloadFile(path, name)
+  if (action === 'download') return downloadFile(path, name, button)
   if (action === 'rename') return renameEntry(path, name)
   if (action === 'delete') return deleteEntry(path, name, button.dataset.directory === 'true')
 })
@@ -384,7 +403,7 @@ document.querySelector('#new-file-button').addEventListener('click', async () =>
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path, content: '', create: true })
     })
-    await loadDirectory(currentPath, true)
+    await loadDirectory(currentPath)
     await openEditor(path, filename, true)
   } catch (error) {
     showMessage(browserMessage, error.message)
@@ -406,7 +425,7 @@ uploadInput.addEventListener('change', async () => {
       await response.json()
     }
     showMessage(browserMessage, `${files.length} ${files.length === 1 ? 'file' : 'files'} uploaded.`, true)
-    await loadDirectory(currentPath, true)
+    await loadDirectory(currentPath)
   } catch (error) {
     showMessage(browserMessage, error.message)
   } finally {
@@ -453,40 +472,58 @@ async function openEditor(path, name, forceText = false) {
   forceTextMode = forceText
   originalContents = ''
   editorTitle.textContent = name
-  editorMode.textContent = 'TEXT FILE'
   editorContent.value = ''
   editorContent.disabled = false
-  document.querySelector('#save-file-button').disabled = false
-  document.querySelector('#save-file-button').textContent = 'Save changes'
+  document.querySelector('#save-file-button').disabled = true
+  document.querySelector('#save-file-button').textContent = 'Save'
   document.querySelector('#reload-file-button').classList.remove('hidden')
   document.querySelector('#download-file-button').classList.remove('hidden')
   showMessage(editorMessage, '')
+  editorDialog.showModal()
+  saveLastView(currentPath, { path, name })
   try {
     const loaded = await reloadEditorFile()
     if (!loaded) return
   } catch (error) {
-    showMessage(browserMessage, error.message)
-    return
+    showMessage(editorMessage, error.message)
   }
-  editorDialog.showModal()
-  saveLastView(currentPath, { path, name })
 }
 
 editorDialog.addEventListener('close', () => saveLastView(currentPath))
 
 async function reloadEditorFile() {
-  const response = await request('/file', {}, { path: activeFilePath })
-  const contentType = response.headers.get('content-type')
-  if (!forceTextMode && !isTextType(contentType, activeFilePath)) {
-    editorDialog.close()
-    await downloadFile(activeFilePath, activeFilePath.split('/').at(-1))
-    return false
+  const saveButton = document.querySelector('#save-file-button')
+  const reloadButton = document.querySelector('#reload-file-button')
+  saveButton.disabled = true
+  reloadButton.disabled = true
+  reloadButton.classList.add('is-loading')
+  reloadButton.setAttribute('aria-label', 'Loading file')
+  reloadButton.title = 'Loading file…'
+  showMessage(editorMessage, '')
+  try {
+    const response = await request('/file', {}, { path: activeFilePath })
+    const contentType = response.headers.get('content-type')
+    if (!forceTextMode && !isTextType(contentType, activeFilePath)) {
+      editorDialog.close()
+      await downloadFile(
+        activeFilePath,
+        activeFilePath.split('/').at(-1),
+        document.querySelector('#download-file-button')
+      )
+      return false
+    }
+    const contents = await response.text()
+    editorContent.value = contents
+    originalContents = contents
+    saveButton.disabled = false
+    showMessage(editorMessage, '')
+    return true
+  } finally {
+    reloadButton.disabled = false
+    reloadButton.classList.remove('is-loading')
+    reloadButton.setAttribute('aria-label', 'Reload file from server')
+    reloadButton.title = 'Reload file'
   }
-  const contents = await response.text()
-  editorContent.value = contents
-  originalContents = contents
-  showMessage(editorMessage, 'Latest version loaded from the SFTP server.', true)
-  return true
 }
 
 document.querySelector('#reload-file-button').addEventListener('click', async () => {
@@ -495,6 +532,61 @@ document.querySelector('#reload-file-button').addEventListener('click', async ()
     await reloadEditorFile()
   } catch (error) {
     showMessage(editorMessage, error.message)
+  }
+})
+
+document.querySelector('#rename-file-button').addEventListener('click', async event => {
+  event.currentTarget.closest('.action-menu')?.removeAttribute('open')
+  const currentName = activeFilePath.split('/').at(-1)
+  const newName = window.prompt('Rename to', currentName)
+  if (!newName?.trim() || newName.trim() === currentName) return
+  const filename = newName.trim()
+  if (filename.includes('/') || filename === '.' || filename === '..') {
+    showMessage(editorMessage, 'Enter a file name without folder separators.')
+    return
+  }
+
+  const button = event.currentTarget
+  button.disabled = true
+  try {
+    const parentPath = activeFilePath.slice(0, activeFilePath.lastIndexOf('/')) || '/'
+    const newPath = joinPath(parentPath, filename)
+    await request('/rename', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: activeFilePath, newPath })
+    })
+    activeFilePath = newPath
+    editorTitle.textContent = filename
+    await loadDirectory(currentPath)
+    saveLastView(currentPath, { path: activeFilePath, name: filename })
+    showMessage(editorMessage, '')
+  } catch (error) {
+    showMessage(editorMessage, error.message)
+  } finally {
+    button.disabled = false
+  }
+})
+
+document.querySelector('#delete-file-button').addEventListener('click', async event => {
+  event.currentTarget.closest('.action-menu')?.removeAttribute('open')
+  const filename = activeFilePath.split('/').at(-1)
+  const hasUnsavedChanges = editorContent.value !== originalContents
+  const warning = hasUnsavedChanges
+    ? `Delete "${filename}"? This cannot be undone. Your unsaved changes will be lost.`
+    : `Delete "${filename}"? This cannot be undone.`
+  if (!window.confirm(warning)) return
+
+  const button = event.currentTarget
+  button.disabled = true
+  try {
+    await request('/entry', { method: 'DELETE' }, { path: activeFilePath })
+    editorDialog.close()
+    await loadDirectory(currentPath)
+  } catch (error) {
+    showMessage(editorMessage, error.message)
+  } finally {
+    button.disabled = false
   }
 })
 
@@ -507,7 +599,8 @@ document.querySelector('#save-file-button').addEventListener('click', async () =
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path: activeFilePath, content: editorContent.value })
     })
-    editorDialog.close()
+    originalContents = editorContent.value
+    showMessage(editorMessage, 'Saved.', true)
     await loadDirectory(currentPath)
   } catch (error) {
     showMessage(editorMessage, error.message)
@@ -516,11 +609,14 @@ document.querySelector('#save-file-button').addEventListener('click', async () =
   }
 })
 
-document.querySelector('#download-file-button').addEventListener('click', () => {
-  downloadFile(activeFilePath, activeFilePath.split('/').at(-1))
+document.querySelector('#download-file-button').addEventListener('click', event => {
+  event.currentTarget.closest('.action-menu')?.removeAttribute('open')
+  downloadFile(activeFilePath, activeFilePath.split('/').at(-1), event.currentTarget)
 })
 
-async function downloadFile(path, name) {
+async function downloadFile(path, name, button) {
+  button?.classList.remove('download-complete')
+  if (button) button.title = 'Download'
   try {
     const response = await request('/file', {}, { path })
     const blob = await response.blob()
@@ -532,12 +628,13 @@ async function downloadFile(path, name) {
     link.click()
     link.remove()
     setTimeout(() => URL.revokeObjectURL(url), 60000)
+    button?.classList.add('download-complete')
+    if (button) button.title = 'Downloaded'
   } catch (error) {
     showMessage(browserMessage, error.message)
   }
 }
 
-document.querySelector('#cancel-editor-button').addEventListener('click', () => editorDialog.close())
 editorDialog.querySelector('.dialog-close-form').addEventListener('submit', event => {
   if (editorContent.value !== originalContents && !window.confirm('Discard your unsaved edits?')) event.preventDefault()
 })
