@@ -905,6 +905,15 @@
       padding: 1.5rem 0 0;
     }
 
+    .btn-back {
+      min-width: 2.5rem;
+      padding: 0.45rem 0.55rem;
+    }
+
+    .btn-back-label {
+      display: none;
+    }
+
     .hint-label {
       display: none;
     }
@@ -1668,7 +1677,7 @@
     <div id="reader-stack">
       <div id="reader-screen" class="screen hidden">
         <div class="reader-top">
-          <button class="btn-back" id="btn-back">ｘ Close</button>
+          <button class="btn-back" id="btn-back" type="button" aria-label="Close reader" title="Close reader">ｘ <span class="btn-back-label">Close</span></button>
           <div class="reader-font-row">
             <button class="reader-underline-btn" id="btn-underline-mode" type="button" aria-label="Underline mode" title="Underline mode" aria-pressed="false" disabled>U</button>
             <button class="reader-font-btn" id="btn-font-increase" type="button">A+</button>
