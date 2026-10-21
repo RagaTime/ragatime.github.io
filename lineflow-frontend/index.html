@@ -499,6 +499,13 @@
     letter-spacing: 0.01em;
   }
 
+  .line-text.is-underlined {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.18em;
+  }
+
   .line-text.exit-up        { animation: exitUp 0.09s ease forwards; }
   .line-text.exit-down      { animation: exitDown 0.09s ease forwards; }
   .line-text.enter-from-below { animation: enterFromBelow 0.09s ease forwards; }
@@ -510,6 +517,7 @@
     right: 0.75rem;
     z-index: 4;
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 0.4rem;
     transform: translateY(-50%);
@@ -530,6 +538,25 @@
   .reader-copy-btn:active {
     border-color: var(--accent);
     color: var(--accent);
+  }
+
+  .reader-copy-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .reader-copy-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .reader-copy-btn.active:disabled {
+    opacity: 1;
+  }
+
+  #btn-underline-line:disabled {
+    opacity: 1;
   }
 
   .reader-copy-status {
@@ -685,6 +712,31 @@
     font-size: 0.65rem;
     letter-spacing: 0.2em;
     color: #9c948c;
+  }
+
+  .reader-underline-btn {
+    min-width: 2.5rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.55rem 0.65rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .reader-underline-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .reader-underline-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
   }
 
   #done-screen {
@@ -1618,6 +1670,7 @@
         <div class="reader-top">
           <button class="btn-back" id="btn-back">ｘ Close</button>
           <div class="reader-font-row">
+            <button class="reader-underline-btn" id="btn-underline-mode" type="button" aria-label="Underline mode" title="Underline mode" aria-pressed="false" disabled>U</button>
             <button class="reader-font-btn" id="btn-font-increase" type="button">A+</button>
             <button class="reader-font-btn" id="btn-font-reset" type="button">A</button>
             <button class="reader-font-btn" id="btn-font-decrease" type="button">A-</button>
@@ -1626,6 +1679,7 @@
         </div>
         <div class="reader-copy-control">
           <span class="reader-copy-status hidden" id="reader-copy-status" role="status" aria-live="polite"></span>
+          <button class="reader-copy-btn" id="btn-underline-line" type="button" aria-label="Underline current line" title="Underline current line" aria-pressed="false" disabled>Underline</button>
           <button class="reader-copy-btn" id="btn-copy-line" type="button">Copy</button>
         </div>
         <div class="reading-zone" id="reading-zone">
@@ -1860,8 +1914,10 @@
     btnFontIncrease: $('#btn-font-increase'),
     btnFontReset: $('#btn-font-reset'),
     btnFontDecrease: $('#btn-font-decrease'),
+    btnUnderlineMode: $('#btn-underline-mode'),
     readerFontSizeLabel: $('#reader-font-size-label'),
     btnCopyLine: $('#btn-copy-line'),
+    btnUnderlineLine: $('#btn-underline-line'),
     readerCopyStatus: $('#reader-copy-status'),
     btnRestart: $('#btn-restart'),
     btnNew: $('#btn-new'),
@@ -1943,6 +1999,9 @@
     currentReadingIntroAlertShown: false,
     sessionLinesRead: 0,
     lines: [],
+    underlines: [],
+    underlineModeEnabled: false,
+    underlineMutationPending: false,
     current: 0,
     startTime: null,
     lastDirection: null,
@@ -2373,6 +2432,9 @@
     state.startTime = Date.now();
     state.currentReadingDocId = documentId;
     state.currentReadingDocUserId = safeId(documentUserId) || null;
+    state.underlines = [];
+    state.underlineModeEnabled = false;
+    syncUnderlineModeButton();
     state.currentReadingIntroAlertShown = false;
     state.sessionLinesRead = parsed.length ? 1 : 0;
     document.body.classList.add('in-reader-mode');
@@ -2392,6 +2454,15 @@
     const canResume = isOwnedByCurrentUser(doc);
     const resumeLineIndex = canResume ? getResumeLineIndex(doc, parseText(dom.textInput.value).length) : 0;
     startReadingFromText(dom.textInput.value, safeId(doc._id), resumeLineIndex, safeId(doc.userId));
+    // startReadingFromText resets local reader state; restore the document's owner-only underline state.
+    state.underlines = canResume && Array.isArray(doc.underlines)
+      ? doc.underlines
+        .filter(line => Number.isSafeInteger(line) && line >= 1 && line <= state.lines.length)
+        .sort((a, b) => a - b)
+      : [];
+    state.underlineModeEnabled = canResume && doc.underlineModeEnabled === true;
+    syncUnderlineModeButton();
+    renderLine(null);
     if (!canResume && !state.currentReadingIntroAlertShown) {
       state.currentReadingIntroAlertShown = true;
       showNonOwnedReadingNotice();
@@ -2402,7 +2473,9 @@
     const line = state.lines[state.current];
     if (!line) return;
     dom.lineBadge.textContent = `LINE ${state.current + 1}`;
-    dom.btnPrev.disabled = state.current === 0;
+    dom.btnPrev.disabled = getNavigationTarget('prev') === null;
+    dom.btnNext.disabled = state.underlineModeEnabled && getNavigationTarget('next') === null;
+    syncCurrentLineUnderlineButton();
     applyReaderFontSize();
 
     if (direction === null) {
@@ -2446,6 +2519,54 @@
     }
   };
 
+  const isCurrentReadingDocumentOwned = () => Boolean(
+    state.currentReadingDocId &&
+    state.user &&
+    safeId(state.currentReadingDocUserId) === safeId(state.user.userId)
+  );
+
+  const syncCurrentLineUnderlineButton = () => {
+    const lineNumber = state.current + 1;
+    const isUnderlined = state.underlines.includes(lineNumber);
+    dom.lineText.classList.toggle('is-underlined', isUnderlined);
+    dom.btnUnderlineLine.classList.toggle('active', isUnderlined);
+    dom.btnUnderlineLine.setAttribute('aria-pressed', String(isUnderlined));
+    dom.btnUnderlineLine.textContent = isUnderlined ? 'Underlined' : 'Underline';
+    dom.btnUnderlineLine.setAttribute('aria-label', isUnderlined ? 'Remove underline from current line' : 'Underline current line');
+    dom.btnUnderlineLine.disabled = !isCurrentReadingDocumentOwned() || state.underlineMutationPending;
+    dom.btnUnderlineLine.title = isCurrentReadingDocumentOwned()
+      ? (isUnderlined ? 'Remove underline from current line' : 'Underline current line')
+      : 'Underline is available for your own documents';
+  };
+
+  const toggleCurrentLineUnderline = async () => {
+    if (dom.btnUnderlineLine.disabled) return;
+
+    const documentId = safeId(state.currentReadingDocId);
+    const lineNumber = state.current + 1;
+    const wasUnderlined = state.underlines.includes(lineNumber);
+    state.underlineMutationPending = true;
+    state.underlines = wasUnderlined
+      ? state.underlines.filter(line => line !== lineNumber)
+      : [...state.underlines, lineNumber].sort((a, b) => a - b);
+    syncCurrentLineUnderlineButton();
+
+    try {
+      await apiRequest(`/documents/${documentId}/underlines/${lineNumber}`, {
+        method: wasUnderlined ? 'DELETE' : 'PUT',
+      });
+    } catch (error) {
+      state.underlines = wasUnderlined
+        ? [...state.underlines, lineNumber].sort((a, b) => a - b)
+        : state.underlines.filter(line => line !== lineNumber);
+      console.error('Could not update current line underline', error);
+      showReaderCopyStatus('Underline update failed');
+    } finally {
+      state.underlineMutationPending = false;
+      syncCurrentLineUnderlineButton();
+    }
+  };
+
   const showDone = () => {
     const elapsed = Math.round((Date.now() - state.startTime) / 1000);
     const mins = Math.floor(elapsed / 60);
@@ -2474,20 +2595,77 @@
     }, 300);
   };
 
+  const syncUnderlineModeButton = () => {
+    const isOwner = isCurrentReadingDocumentOwned();
+    dom.btnUnderlineMode.classList.toggle('active', state.underlineModeEnabled);
+    dom.btnUnderlineMode.setAttribute('aria-pressed', String(state.underlineModeEnabled));
+    dom.btnUnderlineMode.disabled = !isOwner;
+    dom.btnUnderlineMode.title = isOwner ? 'Underline mode' : 'Underline mode is available for your own documents';
+  };
+
+  const getNavigationTarget = direction => {
+    if (!state.lines.length) return null;
+    if (!state.underlineModeEnabled) {
+      const target = state.current + (direction === 'next' ? 1 : -1);
+      return target >= 0 && target < state.lines.length ? target : null;
+    }
+
+    const currentLineNumber = state.current + 1;
+    if (direction === 'next') {
+      const nextLine = state.underlines.find(lineNumber => lineNumber > currentLineNumber);
+      return nextLine === undefined ? null : nextLine - 1;
+    }
+
+    const previousLines = state.underlines.filter(lineNumber => lineNumber < currentLineNumber);
+    return previousLines.length ? previousLines[previousLines.length - 1] - 1 : null;
+  };
+
+  const toggleUnderlineMode = async () => {
+    if (dom.btnUnderlineMode.disabled) return;
+    const documentId = safeId(state.currentReadingDocId);
+    if (!documentId) return;
+
+    const previousValue = state.underlineModeEnabled;
+    state.underlineModeEnabled = !previousValue;
+    dom.btnUnderlineMode.disabled = true;
+    syncUnderlineModeButton();
+    dom.btnUnderlineMode.disabled = true;
+    renderLine(null);
+
+    try {
+      await apiRequest(`/documents/${documentId}/underline-mode`, {
+        method: 'PATCH',
+        body: { underlineModeEnabled: state.underlineModeEnabled },
+      });
+    } catch (error) {
+      state.underlineModeEnabled = previousValue;
+      console.error('Could not sync underline mode', error);
+    } finally {
+      syncUnderlineModeButton();
+      renderLine(null);
+    }
+  };
+
   const goNext = () => {
-    if (state.current >= state.lines.length - 1) {
+    const target = getNavigationTarget('next');
+    if (target === null) {
+      if (!state.underlineModeEnabled && state.current >= state.lines.length - 1) showDone();
+      return;
+    }
+    if (target >= state.lines.length) {
       showDone();
       return;
     }
-    state.current += 1;
+    state.current = target;
     state.sessionLinesRead += 1;
     renderLine('next');
     persistReadPosition();
   };
 
   const goPrev = () => {
-    if (state.current === 0) return;
-    state.current -= 1;
+    const target = getNavigationTarget('prev');
+    if (target === null) return;
+    state.current = target;
     state.sessionLinesRead += 1;
     renderLine('prev');
     persistReadPosition();
@@ -2988,6 +3166,8 @@
 
   dom.btnPrev.addEventListener('click', goPrev);
   dom.btnNext.addEventListener('click', goNext);
+  dom.btnUnderlineLine.addEventListener('click', toggleCurrentLineUnderline);
+  dom.btnUnderlineMode.addEventListener('click', toggleUnderlineMode);
   dom.btnCopyLine.addEventListener('click', copyCurrentLine);
   dom.btnFontIncrease.addEventListener('click', increaseReaderFontSize);
   dom.btnFontReset.addEventListener('click', resetReaderFontSize);
