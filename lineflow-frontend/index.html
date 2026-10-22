@@ -248,6 +248,23 @@
     border: 1px solid transparent;
   }
 
+  .button-loading-spinner::after {
+    content: '';
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    margin-left: 0.55em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    vertical-align: -0.1em;
+    animation: buttonSpinner 0.7s linear infinite;
+  }
+
+  @keyframes buttonSpinner {
+    to { transform: rotate(360deg); }
+  }
+
   .card-actions > button {
       color: var(--text);
       border-color: var(--line);
@@ -513,7 +530,7 @@
 
   .reader-copy-control {
     position: absolute;
-    top: 75%;
+    top: 70%;
     right: 0.75rem;
     z-index: 4;
     display: flex;
@@ -533,6 +550,11 @@
     font-size: 0.55rem;
     letter-spacing: 0.08em;
     cursor: pointer;
+  }
+
+  #btn-underline-line {
+    padding: 0.55rem 0.7rem;
+    font-size: 0.65rem;
   }
 
   .reader-copy-btn:active {
@@ -560,6 +582,10 @@
   }
 
   .reader-copy-status {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.4rem;
     padding: 0.3rem 0.45rem;
     border: 1px solid var(--line);
     border-radius: 4px;
@@ -663,6 +689,94 @@
 
   .reader-nav-row {
     width: 100%;
+  }
+
+  .reader-jump-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .reader-jump-ends {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .reader-jump-btn {
+    width: 100%;
+    padding: 0.65rem 0.55rem;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: var(--surface);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    cursor: pointer;
+  }
+
+  .reader-jump-btn:active:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .reader-jump-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .reader-jump-steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+
+  .reader-custom-jump {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .reader-custom-jump .reader-custom-line-input {
+    flex: 1;
+    width: auto;
+  }
+
+  .reader-navigation-modal-card {
+    max-width: 420px;
+  }
+
+  .reader-navigation-modal-card .reader-jump-btn {
+    letter-spacing: 0.12em;
+  }
+
+  .reader-navigation-modal-card .reader-custom-jump .reader-jump-btn {
+    width: auto;
+    min-width: 4.5rem;
+  }
+
+  .reader-custom-line-input {
+    width: 4.1rem;
+    padding: 0.45rem 0.35rem;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-align: center;
+  }
+
+  .reader-jump-feedback {
+    min-height: 0.8rem;
+    color: var(--danger);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    text-align: center;
+  }
+
+  .reader-jump-feedback:empty {
+    display: none;
   }
 
   .nav-btn {
@@ -1687,9 +1801,10 @@
           </div>
         </div>
         <div class="reader-copy-control">
-          <span class="reader-copy-status hidden" id="reader-copy-status" role="status" aria-live="polite"></span>
           <button class="reader-copy-btn" id="btn-underline-line" type="button" aria-label="Underline current line" title="Underline current line" aria-pressed="false" disabled>Underline</button>
-          <button class="reader-copy-btn" id="btn-copy-line" type="button">Copy</button>
+          <button class="reader-copy-btn" id="btn-copy-line" type="button" aria-live="polite" aria-atomic="true">Copy</button>
+          <button class="reader-copy-btn reader-navigate-btn" id="btn-open-reader-navigation" type="button" aria-label="Open navigation controls" title="Open navigation controls">Navigate</button>
+          <span class="reader-copy-status hidden" id="reader-copy-status" role="status" aria-live="polite"></span>
         </div>
         <div class="reading-zone" id="reading-zone">
           <div class="line-display">
@@ -1713,6 +1828,39 @@
           <div class="reader-nav-row">
             <button class="nav-btn" id="btn-prev">← Prev</button>
             <button class="nav-btn primary" id="btn-next">Next →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lf-modal-backdrop hidden" id="reader-navigation-modal" role="dialog" aria-modal="true" aria-labelledby="reader-navigation-title">
+        <div class="lf-modal-card reader-navigation-modal-card">
+          <div class="lf-modal-header">
+            <div class="lf-modal-title-wrap">
+              <span class="lf-modal-badge">DOCUMENT READER</span>
+              <h2 id="reader-navigation-title">Navigate</h2>
+            </div>
+            <button type="button" class="lf-modal-close" id="btn-close-reader-navigation" aria-label="Close navigation">✕</button>
+          </div>
+          <div class="reader-jump-row" aria-label="Jump through document">
+            <div class="reader-jump-ends" role="group" aria-label="Document boundaries">
+              <button class="reader-jump-btn" id="btn-jump-start" type="button">Start</button>
+              <button class="reader-jump-btn" id="btn-jump-end" type="button">End</button>
+            </div>
+            <div class="reader-jump-steps" role="group" aria-label="Jump by lines">
+              <button class="reader-jump-btn" type="button" data-jump-offset="-80">−80</button>
+              <button class="reader-jump-btn" type="button" data-jump-offset="-40">−40</button>
+              <button class="reader-jump-btn" type="button" data-jump-offset="-20">−20</button>
+              <button class="reader-jump-btn" type="button" data-jump-offset="-10">−10</button>
+              <button class="reader-jump-btn" type="button" data-jump-offset="10">+10</button>
+              <button class="reader-jump-btn" type="button" data-jump-offset="20">+20</button>
+              <button class="reader-jump-btn" type="button" data-jump-offset="40">+40</button>
+              <button class="reader-jump-btn" type="button" data-jump-offset="80">+80</button>
+            </div>
+            <form class="reader-custom-jump" id="reader-custom-jump-form">
+              <input class="reader-custom-line-input" id="reader-custom-line" type="number" min="1" step="1" inputmode="numeric" placeholder="Line #" aria-label="Document line number">
+              <button class="reader-jump-btn" type="submit">Go to line</button>
+            </form>
+            <div class="reader-jump-feedback" id="reader-jump-feedback" role="status" aria-live="polite"></div>
           </div>
         </div>
       </div>
@@ -1920,6 +2068,12 @@
     btnBack: $('#btn-back'),
     btnPrev: $('#btn-prev'),
     btnNext: $('#btn-next'),
+    btnJumpStart: $('#btn-jump-start'),
+    btnJumpEnd: $('#btn-jump-end'),
+    jumpOffsetButtons: document.querySelectorAll('[data-jump-offset]'),
+    customJumpForm: $('#reader-custom-jump-form'),
+    customLineInput: $('#reader-custom-line'),
+    jumpFeedback: $('#reader-jump-feedback'),
     btnFontIncrease: $('#btn-font-increase'),
     btnFontReset: $('#btn-font-reset'),
     btnFontDecrease: $('#btn-font-decrease'),
@@ -1927,6 +2081,9 @@
     readerFontSizeLabel: $('#reader-font-size-label'),
     btnCopyLine: $('#btn-copy-line'),
     btnUnderlineLine: $('#btn-underline-line'),
+    btnOpenReaderNavigation: $('#btn-open-reader-navigation'),
+    readerNavigationModal: $('#reader-navigation-modal'),
+    btnCloseReaderNavigation: $('#btn-close-reader-navigation'),
     readerCopyStatus: $('#reader-copy-status'),
     btnRestart: $('#btn-restart'),
     btnNew: $('#btn-new'),
@@ -2379,21 +2536,47 @@
     return response?.data?.document || null;
   };
 
-  const openDocumentById = async (documentId, action, feedbackEl) => {
+  const withDelayedButtonSpinner = async (button, task) => {
+    let spinnerTimer;
+    let spinnerShown = false;
     try {
-      const fullDoc = await fetchDocumentById(documentId);
-      if (!fullDoc) {
-        setFeedback(feedbackEl, 'Could not load the document.', 'error');
-        return;
+      spinnerTimer = setTimeout(() => {
+        spinnerShown = true;
+        button.classList.add('button-loading-spinner');
+        button.setAttribute('aria-busy', 'true');
+      }, 1000);
+      return await task();
+    } finally {
+      clearTimeout(spinnerTimer);
+      if (spinnerShown) {
+        button.classList.remove('button-loading-spinner');
+        button.removeAttribute('aria-busy');
       }
-      if (action === 'read') {
-        startReadingFromDoc(fullDoc);
-      } else if (action === 'edit') {
-        selectDocument(fullDoc);
-      }
-    } catch (err) {
-      setFeedback(feedbackEl, err.message || 'Could not load the document.', 'error');
     }
+  };
+
+  const openDocumentById = async (documentId, action, feedbackEl, loadingButton = null) => {
+    const openDocument = async () => {
+      try {
+        const fullDoc = await fetchDocumentById(documentId);
+        if (!fullDoc) {
+          setFeedback(feedbackEl, 'Could not load the document.', 'error');
+          return;
+        }
+        if (action === 'read') {
+          startReadingFromDoc(fullDoc);
+        } else if (action === 'edit') {
+          selectDocument(fullDoc);
+        }
+      } catch (err) {
+        setFeedback(feedbackEl, err.message || 'Could not load the document.', 'error');
+      }
+    };
+
+    if (action === 'read' && loadingButton) {
+      return withDelayedButtonSpinner(loadingButton, openDocument);
+    }
+    return openDocument();
   };
 
   const showNonOwnedReadingNotice = () => {
@@ -2443,6 +2626,9 @@
     state.currentReadingDocUserId = safeId(documentUserId) || null;
     state.underlines = [];
     state.underlineModeEnabled = false;
+    dom.customLineInput.value = '';
+    dom.jumpFeedback.textContent = '';
+    dom.customLineInput.removeAttribute('aria-invalid');
     syncUnderlineModeButton();
     state.currentReadingIntroAlertShown = false;
     state.sessionLinesRead = parsed.length ? 1 : 0;
@@ -2482,8 +2668,7 @@
     const line = state.lines[state.current];
     if (!line) return;
     dom.lineBadge.textContent = `LINE ${state.current + 1}`;
-    dom.btnPrev.disabled = getNavigationTarget('prev') === null;
-    dom.btnNext.disabled = state.underlineModeEnabled && getNavigationTarget('next') === null;
+    syncJumpControls();
     syncCurrentLineUnderlineButton();
     applyReaderFontSize();
 
@@ -2521,11 +2706,20 @@
         throw new Error('Clipboard access is not available');
       }
       await navigator.clipboard.writeText(dom.lineText.textContent);
-      showReaderCopyStatus('Copied!');
+      showCopyButtonFeedback('Copied!');
     } catch (error) {
       console.error('Could not copy the current line', error);
-      showReaderCopyStatus('Copy failed');
+      showCopyButtonFeedback('Copy failed');
     }
+  };
+
+  let copyButtonFeedbackTimeoutId;
+  const showCopyButtonFeedback = message => {
+    dom.btnCopyLine.textContent = message;
+    clearTimeout(copyButtonFeedbackTimeoutId);
+    copyButtonFeedbackTimeoutId = setTimeout(() => {
+      dom.btnCopyLine.textContent = 'Copy';
+    }, 1000);
   };
 
   const isCurrentReadingDocumentOwned = () => Boolean(
@@ -2573,6 +2767,7 @@
     } finally {
       state.underlineMutationPending = false;
       syncCurrentLineUnderlineButton();
+      syncJumpControls();
     }
   };
 
@@ -2612,21 +2807,116 @@
     dom.btnUnderlineMode.title = isOwner ? 'Underline mode' : 'Underline mode is available for your own documents';
   };
 
-  const getNavigationTarget = direction => {
+  const getNavigationTarget = (direction, steps = 1) => {
     if (!state.lines.length) return null;
     if (!state.underlineModeEnabled) {
-      const target = state.current + (direction === 'next' ? 1 : -1);
-      return target >= 0 && target < state.lines.length ? target : null;
+      const delta = direction === 'next' ? steps : -steps;
+      const target = Math.min(state.lines.length - 1, Math.max(0, state.current + delta));
+      return target === state.current ? null : target;
     }
 
     const currentLineNumber = state.current + 1;
     if (direction === 'next') {
-      const nextLine = state.underlines.find(lineNumber => lineNumber > currentLineNumber);
-      return nextLine === undefined ? null : nextLine - 1;
+      const firstNextIndex = state.underlines.findIndex(lineNumber => lineNumber > currentLineNumber);
+      if (firstNextIndex === -1) return null;
+      const targetIndex = Math.min(state.underlines.length - 1, firstNextIndex + steps - 1);
+      return state.underlines[targetIndex] - 1;
     }
 
-    const previousLines = state.underlines.filter(lineNumber => lineNumber < currentLineNumber);
-    return previousLines.length ? previousLines[previousLines.length - 1] - 1 : null;
+    let lastPreviousIndex = -1;
+    for (let index = 0; index < state.underlines.length; index += 1) {
+      if (state.underlines[index] < currentLineNumber) lastPreviousIndex = index;
+      else break;
+    }
+    if (lastPreviousIndex === -1) return null;
+    const targetIndex = Math.max(0, lastPreviousIndex - steps + 1);
+    return state.underlines[targetIndex] - 1;
+  };
+
+  const syncJumpControls = () => {
+    const previousTarget = getNavigationTarget('prev');
+    const nextTarget = getNavigationTarget('next');
+    const startTarget = state.underlineModeEnabled
+      ? (state.underlines.length ? state.underlines[0] - 1 : null)
+      : (state.lines.length ? 0 : null);
+    const endTarget = state.underlineModeEnabled
+      ? (state.underlines.length ? state.underlines[state.underlines.length - 1] - 1 : null)
+      : (state.lines.length ? state.lines.length - 1 : null);
+
+    dom.btnPrev.disabled = previousTarget === null;
+    dom.btnNext.disabled = state.underlineModeEnabled && nextTarget === null;
+    dom.btnJumpStart.disabled = startTarget === null || startTarget === state.current;
+    dom.btnJumpEnd.disabled = endTarget === null || endTarget === state.current;
+    dom.customLineInput.max = String(state.lines.length || 1);
+    dom.customLineInput.disabled = state.lines.length === 0;
+
+    dom.jumpOffsetButtons.forEach(button => {
+      const offset = Number(button.dataset.jumpOffset);
+      const target = getNavigationTarget(offset > 0 ? 'next' : 'prev', Math.abs(offset));
+      button.disabled = target === null;
+    });
+  };
+
+  const navigateToLineIndex = (target, direction = null) => {
+    if (target === null || target === state.current || target < 0 || target >= state.lines.length) return;
+    state.current = target;
+    state.sessionLinesRead += 1;
+    renderLine(direction);
+    persistReadPosition();
+  };
+
+  const jumpToDocumentStart = () => {
+    const target = state.underlineModeEnabled
+      ? (state.underlines.length ? state.underlines[0] - 1 : null)
+      : (state.lines.length ? 0 : null);
+    navigateToLineIndex(target, target !== null && target < state.current ? 'prev' : 'next');
+  };
+
+  const jumpToDocumentEnd = () => {
+    const target = state.underlineModeEnabled
+      ? (state.underlines.length ? state.underlines[state.underlines.length - 1] - 1 : null)
+      : (state.lines.length ? state.lines.length - 1 : null);
+    navigateToLineIndex(target, target !== null && target < state.current ? 'prev' : 'next');
+  };
+
+  const jumpToCustomLine = () => {
+    const requestedLine = Number(dom.customLineInput.value);
+    if (!Number.isSafeInteger(requestedLine) || requestedLine < 1 || requestedLine > state.lines.length) {
+      dom.jumpFeedback.textContent = `Enter a line number from 1 to ${state.lines.length}.`;
+      dom.customLineInput.setAttribute('aria-invalid', 'true');
+      return false;
+    }
+
+    let target = requestedLine - 1;
+    if (state.underlineModeEnabled) {
+      if (!state.underlines.length) {
+        dom.jumpFeedback.textContent = 'There are no underlined lines to jump to.';
+        return false;
+      }
+      const nextUnderlinedLine = state.underlines.find(lineNumber => lineNumber >= requestedLine);
+      target = (nextUnderlinedLine ?? state.underlines[state.underlines.length - 1]) - 1;
+    }
+
+    dom.jumpFeedback.textContent = '';
+    dom.customLineInput.removeAttribute('aria-invalid');
+    dom.customLineInput.value = String(target + 1);
+    navigateToLineIndex(target, target < state.current ? 'prev' : 'next');
+    return true;
+  };
+
+  const openReaderNavigationModal = () => {
+    dom.readerNavigationModal.classList.remove('hidden');
+    dom.btnCloseReaderNavigation.focus();
+  };
+
+  const closeReaderNavigationModal = () => {
+    dom.readerNavigationModal.classList.add('hidden');
+    dom.btnOpenReaderNavigation.focus();
+  };
+
+  const jumpByOffset = offset => {
+    const target = getNavigationTarget(offset > 0 ? 'next' : 'prev', Math.abs(offset));
+    navigateToLineIndex(target, offset > 0 ? 'next' : 'prev');
   };
 
   const toggleUnderlineMode = async () => {
@@ -2661,23 +2951,13 @@
       if (!state.underlineModeEnabled && state.current >= state.lines.length - 1) showDone();
       return;
     }
-    if (target >= state.lines.length) {
-      showDone();
-      return;
-    }
-    state.current = target;
-    state.sessionLinesRead += 1;
-    renderLine('next');
-    persistReadPosition();
+    navigateToLineIndex(target, 'next');
   };
 
   const goPrev = () => {
     const target = getNavigationTarget('prev');
     if (target === null) return;
-    state.current = target;
-    state.sessionLinesRead += 1;
-    renderLine('prev');
-    persistReadPosition();
+    navigateToLineIndex(target, 'prev');
   };
 
   const resetUpdateForm = () => {
@@ -2753,7 +3033,7 @@
         const idx = Number(button.dataset.feedIndex);
         const doc = state.feedDocs[idx];
         if (!doc) return;
-        if (action === 'load') openDocumentById(safeId(doc._id), 'read', dom.feedFeedback);
+        if (action === 'load') openDocumentById(safeId(doc._id), 'read', dom.feedFeedback, button);
         if (action === 'copy') {
           button.textContent = 'Copied to My Docs ✅';
           button.disabled = true;
@@ -2802,7 +3082,7 @@
           const idx = Number(button.dataset.searchIndex);
           const doc = state.searchDocs[idx];
           if (!doc) return;
-          if (action === 'read') openDocumentById(safeId(doc._id), 'read', dom.searchFeedback);
+          if (action === 'read') openDocumentById(safeId(doc._id), 'read', dom.searchFeedback, button);
           if (action === 'copy') {
             button.textContent = 'COPIED';
             button.disabled = true;
@@ -3151,11 +3431,11 @@
   dom.btnShowCreate.addEventListener('click', showCreatePanel);
   dom.btnRefreshFeed.addEventListener('click', refreshFeed);
   (dom.feedToggleButtons || []).forEach(button => {
-    button.addEventListener('click', () => {
+      button.addEventListener('click', () => {
       const view = button.dataset.feedView;
       if (!view) return;
       setActiveFeedView(view);
-      refreshFeed(view);
+        withDelayedButtonSpinner(button, () => refreshFeed(view));
     });
   });
   dom.btnSendOtp.addEventListener('click', handleSendOtp);
@@ -3175,6 +3455,33 @@
 
   dom.btnPrev.addEventListener('click', goPrev);
   dom.btnNext.addEventListener('click', goNext);
+  dom.btnOpenReaderNavigation.addEventListener('click', openReaderNavigationModal);
+  dom.btnCloseReaderNavigation.addEventListener('click', closeReaderNavigationModal);
+  dom.readerNavigationModal.addEventListener('click', event => {
+    if (event.target === dom.readerNavigationModal) closeReaderNavigationModal();
+  });
+  dom.btnJumpStart.addEventListener('click', () => {
+    jumpToDocumentStart();
+    closeReaderNavigationModal();
+  });
+  dom.btnJumpEnd.addEventListener('click', () => {
+    jumpToDocumentEnd();
+    closeReaderNavigationModal();
+  });
+  dom.jumpOffsetButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      jumpByOffset(Number(button.dataset.jumpOffset));
+      closeReaderNavigationModal();
+    });
+  });
+  dom.customJumpForm.addEventListener('submit', event => {
+    event.preventDefault();
+    if (jumpToCustomLine()) closeReaderNavigationModal();
+  });
+  dom.customLineInput.addEventListener('input', () => {
+    dom.jumpFeedback.textContent = '';
+    dom.customLineInput.removeAttribute('aria-invalid');
+  });
   dom.btnUnderlineLine.addEventListener('click', toggleCurrentLineUnderline);
   dom.btnUnderlineMode.addEventListener('click', toggleUnderlineMode);
   dom.btnCopyLine.addEventListener('click', copyCurrentLine);
@@ -3237,6 +3544,11 @@
 
   document.addEventListener('keydown', e => {
     if (dom.readerScreen.classList.contains('hidden')) return;
+    if (!dom.readerNavigationModal.classList.contains('hidden')) {
+      if (e.key === 'Escape') closeReaderNavigationModal();
+      return;
+    }
+    if (e.target instanceof HTMLElement && e.target.matches('input, textarea, select, [contenteditable="true"]')) return;
     if (['ArrowDown','ArrowRight',' '].includes(e.key)) { e.preventDefault(); goNext(); }
     if (['ArrowUp','ArrowLeft'].includes(e.key)) { e.preventDefault(); goPrev(); }
   });
@@ -3411,7 +3723,7 @@
       if (timerDom.pillDot) {
         timerDom.pillDot.className = 'timer-pill-dot paused';
       }
-      if (timerDom.pillTime) timerDom.pillTime.textContent = `${formatted} (Paused)`;
+      if (timerDom.pillTime) timerDom.pillTime.textContent = formatted;
       if (timerDom.headerTimerLabel) {
         timerDom.headerTimerLabel.textContent = `Paused: ${formatted}`;
       }
