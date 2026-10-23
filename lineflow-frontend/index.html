@@ -454,7 +454,6 @@
     height: 93dvh;
     position: relative;
     overflow: hidden;
-    touch-action: none;
   }
 
   #reader-stack {
@@ -489,6 +488,7 @@
     padding: 2rem 2.5rem;
     position: relative;
     overflow: hidden;
+    touch-action: none;
   }
 
   .line-display {
@@ -553,8 +553,11 @@
   }
 
   #btn-underline-line {
+    width: 6rem;
     padding: 0.55rem 0.7rem;
     font-size: 0.65rem;
+    text-align: center;
+    white-space: nowrap;
   }
 
   .reader-copy-btn:active {
@@ -2167,7 +2170,6 @@
     lines: [],
     underlines: [],
     underlineModeEnabled: false,
-    underlineMutationPending: false,
     current: 0,
     startTime: null,
     lastDirection: null,
@@ -2736,38 +2738,68 @@
     dom.btnUnderlineLine.setAttribute('aria-pressed', String(isUnderlined));
     dom.btnUnderlineLine.textContent = isUnderlined ? 'Underlined' : 'Underline';
     dom.btnUnderlineLine.setAttribute('aria-label', isUnderlined ? 'Remove underline from current line' : 'Underline current line');
-    dom.btnUnderlineLine.disabled = !isCurrentReadingDocumentOwned() || state.underlineMutationPending;
+    dom.btnUnderlineLine.disabled = !isCurrentReadingDocumentOwned();
     dom.btnUnderlineLine.title = isCurrentReadingDocumentOwned()
       ? (isUnderlined ? 'Remove underline from current line' : 'Underline current line')
       : 'Underline is available for your own documents';
   };
 
+  const underlineMutationStates = new Map();
+
+  const setLocalLineUnderline = (lineNumber, isUnderlined) => {
+    state.underlines = isUnderlined
+      ? (state.underlines.includes(lineNumber)
+        ? state.underlines
+        : [...state.underlines, lineNumber].sort((a, b) => a - b))
+      : state.underlines.filter(line => line !== lineNumber);
+    syncCurrentLineUnderlineButton();
+    syncJumpControls();
+  };
+
   const toggleCurrentLineUnderline = async () => {
-    if (dom.btnUnderlineLine.disabled) return;
+    if (!isCurrentReadingDocumentOwned()) return;
 
     const documentId = safeId(state.currentReadingDocId);
     const lineNumber = state.current + 1;
-    const wasUnderlined = state.underlines.includes(lineNumber);
-    state.underlineMutationPending = true;
-    state.underlines = wasUnderlined
-      ? state.underlines.filter(line => line !== lineNumber)
-      : [...state.underlines, lineNumber].sort((a, b) => a - b);
-    syncCurrentLineUnderlineButton();
+    const mutationKey = `${documentId}:${lineNumber}`;
+    let mutationState = underlineMutationStates.get(mutationKey);
+    if (!mutationState) {
+      const initialValue = state.underlines.includes(lineNumber);
+      mutationState = {
+        confirmedValue: initialValue,
+        desiredValue: initialValue,
+        version: 0,
+        queue: Promise.resolve(),
+      };
+      underlineMutationStates.set(mutationKey, mutationState);
+    }
+
+    const desiredValue = !mutationState.desiredValue;
+    mutationState.desiredValue = desiredValue;
+    const version = ++mutationState.version;
+    setLocalLineUnderline(lineNumber, desiredValue);
+
+    const request = mutationState.queue
+      .catch(() => {})
+      .then(() => apiRequest(`/documents/${documentId}/underlines/${lineNumber}`, {
+        method: desiredValue ? 'PUT' : 'DELETE',
+      }));
+    mutationState.queue = request;
 
     try {
-      await apiRequest(`/documents/${documentId}/underlines/${lineNumber}`, {
-        method: wasUnderlined ? 'DELETE' : 'PUT',
-      });
+      await request;
+      mutationState.confirmedValue = desiredValue;
     } catch (error) {
-      state.underlines = wasUnderlined
-        ? [...state.underlines, lineNumber].sort((a, b) => a - b)
-        : state.underlines.filter(line => line !== lineNumber);
       console.error('Could not update current line underline', error);
-      showReaderCopyStatus('Underline update failed');
+      if (mutationState.version === version && safeId(state.currentReadingDocId) === documentId) {
+        mutationState.desiredValue = mutationState.confirmedValue;
+        setLocalLineUnderline(lineNumber, mutationState.confirmedValue);
+        showReaderCopyStatus('Underline update failed');
+      }
     } finally {
-      state.underlineMutationPending = false;
-      syncCurrentLineUnderlineButton();
-      syncJumpControls();
+      if (mutationState.version === version && mutationState.queue === request) {
+        underlineMutationStates.delete(mutationKey);
+      }
     }
   };
 
@@ -3518,6 +3550,65 @@
   let touchStartY = 0;
   let isDragging = false;
 
+  const readerTouchPointers = new Map();
+  let pendingNativeReaderClick = null;
+  let pendingNativeReaderClickTimerId = null;
+  document.addEventListener('pointerdown', event => {
+    if (event.pointerType !== 'touch' || !event.isPrimary) return;
+    const readerPanel = $('#reader-panel');
+    if (readerPanel.classList.contains('hidden') || !readerPanel.contains(event.target)) return;
+
+    clearTimeout(pendingNativeReaderClickTimerId);
+    pendingNativeReaderClick = null;
+    const target = event.target instanceof Element ? event.target : null;
+    const button = target?.closest('button') || null;
+    readerTouchPointers.set(event.pointerId, {
+      button,
+      startX: event.clientX,
+      startY: event.clientY,
+      moved: false,
+    });
+  }, true);
+
+  document.addEventListener('pointermove', event => {
+    const touchPointer = readerTouchPointers.get(event.pointerId);
+    if (!touchPointer) return;
+    if (Math.hypot(event.clientX - touchPointer.startX, event.clientY - touchPointer.startY) > 12) {
+      touchPointer.moved = true;
+    }
+  }, true);
+
+  document.addEventListener('pointerup', event => {
+    const touchPointer = readerTouchPointers.get(event.pointerId);
+    readerTouchPointers.delete(event.pointerId);
+    if (!touchPointer?.button || touchPointer.moved || touchPointer.button.disabled) return;
+
+    const hitTarget = document.elementFromPoint(event.clientX, event.clientY);
+    if (!(hitTarget instanceof Element) || hitTarget.closest('button') !== touchPointer.button) return;
+
+    // Some mobile browsers omit the synthesized click after touch gestures. Dispatch one for a tap-like button interaction, then suppress a matching native click if the browser also sends one.
+    touchPointer.button.click();
+    pendingNativeReaderClick = touchPointer.button;
+    pendingNativeReaderClickTimerId = setTimeout(() => {
+      pendingNativeReaderClick = null;
+    }, 500);
+  }, true);
+
+  document.addEventListener('pointercancel', event => {
+    readerTouchPointers.delete(event.pointerId);
+  }, true);
+
+  document.addEventListener('click', event => {
+    if (!event.isTrusted || !pendingNativeReaderClick) return;
+    const target = event.target instanceof Element ? event.target.closest('button') : null;
+    if (target !== pendingNativeReaderClick) return;
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    clearTimeout(pendingNativeReaderClickTimerId);
+    pendingNativeReaderClick = null;
+  }, true);
+
   dom.readingZone.addEventListener('touchstart', e => {
     touchStartY = e.touches[0].clientY;
     isDragging = false;
@@ -3534,8 +3625,8 @@
 
   dom.readingZone.addEventListener('touchend', e => {
     dom.dragIndicator.classList.remove('show');
-    if (!isDragging) return;
     const dy = e.changedTouches[0].clientY - touchStartY;
+    if (!isDragging) return;
     if (Math.abs(dy) > 40) {
       if (dy < 0) goNext(); else goPrev();
     }
