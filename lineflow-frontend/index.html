@@ -2544,7 +2544,7 @@
         spinnerShown = true;
         button.classList.add('button-loading-spinner');
         button.setAttribute('aria-busy', 'true');
-      }, 1000);
+      }, 300);
       return await task();
     } finally {
       clearTimeout(spinnerTimer);
