@@ -3551,15 +3551,12 @@
   let isDragging = false;
 
   const readerTouchPointers = new Map();
-  let pendingNativeReaderClick = null;
-  let pendingNativeReaderClickTimerId = null;
+  const pendingReaderTouchClicks = [];
   document.addEventListener('pointerdown', event => {
     if (event.pointerType !== 'touch' || !event.isPrimary) return;
     const readerPanel = $('#reader-panel');
     if (readerPanel.classList.contains('hidden') || !readerPanel.contains(event.target)) return;
 
-    clearTimeout(pendingNativeReaderClickTimerId);
-    pendingNativeReaderClick = null;
     const target = event.target instanceof Element ? event.target : null;
     const button = target?.closest('button') || null;
     readerTouchPointers.set(event.pointerId, {
@@ -3586,12 +3583,24 @@
     const hitTarget = document.elementFromPoint(event.clientX, event.clientY);
     if (!(hitTarget instanceof Element) || hitTarget.closest('button') !== touchPointer.button) return;
 
-    // Some mobile browsers omit the synthesized click after touch gestures. Dispatch one for a tap-like button interaction, then suppress a matching native click if the browser also sends one.
-    touchPointer.button.click();
-    pendingNativeReaderClick = touchPointer.button;
-    pendingNativeReaderClickTimerId = setTimeout(() => {
-      pendingNativeReaderClick = null;
-    }, 500);
+    // Some mobile browsers omit the synthesized click after touch gestures. Give the browser a moment to send its native click; only synthesize one if it does not, so opening a modal cannot retarget that same tap to the new backdrop.
+    const pendingClick = {
+      button: touchPointer.button,
+      x: event.clientX,
+      y: event.clientY,
+      fallbackDispatched: false,
+      timerId: null,
+    };
+    pendingReaderTouchClicks.push(pendingClick);
+    pendingClick.timerId = setTimeout(() => {
+      if (!pendingReaderTouchClicks.includes(pendingClick)) return;
+      pendingClick.fallbackDispatched = true;
+      pendingClick.button.click();
+      pendingClick.timerId = setTimeout(() => {
+        const index = pendingReaderTouchClicks.indexOf(pendingClick);
+        if (index !== -1) pendingReaderTouchClicks.splice(index, 1);
+      }, 500);
+    }, 50);
   }, true);
 
   document.addEventListener('pointercancel', event => {
@@ -3599,14 +3608,28 @@
   }, true);
 
   document.addEventListener('click', event => {
-    if (!event.isTrusted || !pendingNativeReaderClick) return;
+    if (!event.isTrusted || pendingReaderTouchClicks.length === 0) return;
     const target = event.target instanceof Element ? event.target.closest('button') : null;
-    if (target !== pendingNativeReaderClick) return;
+    const pendingIndex = pendingReaderTouchClicks.findIndex(pendingClick => {
+      const sameButton = target === pendingClick.button;
+      const samePoint = Number.isFinite(event.clientX) && Number.isFinite(event.clientY) &&
+        Math.abs(event.clientX - pendingClick.x) <= 24 &&
+        Math.abs(event.clientY - pendingClick.y) <= 24;
+      return sameButton || samePoint;
+    });
+    if (pendingIndex === -1) return;
+
+    const pendingClick = pendingReaderTouchClicks[pendingIndex];
+    if (!pendingClick.fallbackDispatched) {
+      clearTimeout(pendingClick.timerId);
+      pendingReaderTouchClicks.splice(pendingIndex, 1);
+      return;
+    }
 
     event.preventDefault();
     event.stopImmediatePropagation();
-    clearTimeout(pendingNativeReaderClickTimerId);
-    pendingNativeReaderClick = null;
+    clearTimeout(pendingClick.timerId);
+    pendingReaderTouchClicks.splice(pendingIndex, 1);
   }, true);
 
   dom.readingZone.addEventListener('touchstart', e => {
