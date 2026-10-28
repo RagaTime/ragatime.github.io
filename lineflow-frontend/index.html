@@ -2895,6 +2895,12 @@
     state.sessionLinesRead += 1;
     renderLine(direction);
     persistReadPosition();
+
+    // Resume only when navigation follows an automatic pause caused by leaving the tab.
+    if (timer.pausedForTabSwitch) {
+      timer.pausedForTabSwitch = false;
+      resumeTimer();
+    }
   };
 
   const jumpToDocumentStart = () => {
@@ -3705,6 +3711,7 @@
     status: 'idle', // 'idle' | 'running' | 'paused' | 'completed'
     targetEndTime: null,
     intervalId: null,
+    pausedForTabSwitch: false,
     selectedPreset: 25,
     customMinutes: 30
   };
@@ -3784,6 +3791,7 @@
         remainingSeconds: timer.remainingSeconds,
         status: timer.status,
         targetEndTime: timer.targetEndTime,
+        pausedForTabSwitch: timer.pausedForTabSwitch,
         selectedPreset: timer.selectedPreset,
         customMinutes: timer.customMinutes
       };
@@ -3899,6 +3907,7 @@
     timer.totalSeconds = Math.round(mins * 60);
     timer.remainingSeconds = timer.totalSeconds;
     timer.status = 'running';
+    timer.pausedForTabSwitch = false;
     timer.targetEndTime = Date.now() + timer.remainingSeconds * 1000;
 
     if (timer.intervalId) clearInterval(timer.intervalId);
@@ -3931,6 +3940,7 @@
   const resumeTimer = () => {
     if (timer.status !== 'paused' || timer.remainingSeconds <= 0) return;
     timer.status = 'running';
+    timer.pausedForTabSwitch = false;
     timer.targetEndTime = Date.now() + timer.remainingSeconds * 1000;
 
     if (timer.intervalId) clearInterval(timer.intervalId);
@@ -3956,6 +3966,7 @@
       timer.intervalId = null;
     }
     timer.targetEndTime = null;
+    timer.pausedForTabSwitch = false;
     if (newMinutes && !isNaN(newMinutes) && Number(newMinutes) > 0) {
       timer.sessionMins = Number(newMinutes);
     }
@@ -4146,6 +4157,13 @@
 
     if (!timerDom.widget || !timerDom.btn) return;
 
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && timer.status === 'running') {
+        timer.pausedForTabSwitch = true;
+        pauseTimer();
+      }
+    });
+
     setupFloatingDraggable();
 
     // Click pill to open timer modal
@@ -4288,6 +4306,7 @@
             timer.status = 'paused';
             timer.remainingSeconds = data.remainingSeconds || data.totalSeconds;
             timer.targetEndTime = null;
+            timer.pausedForTabSwitch = data.pausedForTabSwitch === true;
             updateTimerUI();
           } else {
             timer.status = 'idle';
