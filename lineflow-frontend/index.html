@@ -2617,23 +2617,69 @@
     return state.sessionLinesRead;
   };
 
-  const closeReaderSessionSummary = () => {
-    dom.readerSessionSummary.classList.add('hidden');
+  let readerHistoryEntryOpen = false;
+  let readerSessionSummaryHistoryEntryOpen = false;
+  let ignoreNextHistoryPop = false;
+
+  const pushReaderHistoryEntry = () => {
+    if (readerHistoryEntryOpen) return;
+    // Reserve both Back steps now so the summary can be dismissed without pushing history during popstate.
+    history.pushState({ ...(history.state || {}), __lineflowReaderEntry: true }, '', window.location.href);
+    history.pushState({ ...(history.state || {}), __lineflowReaderEntry: false, __lineflowReaderSummaryGuard: true }, '', window.location.href);
+    readerHistoryEntryOpen = true;
   };
 
-  const closeReaderPanel = () => {
+  const discardReaderHistoryEntry = (entriesToRemove = 2) => {
+    if (!readerHistoryEntryOpen) return;
+    readerHistoryEntryOpen = false;
+    ignoreNextHistoryPop = true;
+    history.go(-entriesToRemove);
+  };
+
+  const closeReaderSessionSummary = (fromHistory = false) => {
+    dom.readerSessionSummary.classList.add('hidden');
+    if (!readerSessionSummaryHistoryEntryOpen) return;
+    readerSessionSummaryHistoryEntryOpen = false;
+    if (fromHistory && history.state?.__lineflowReaderEntry === true) {
+      readerHistoryEntryOpen = false;
+      ignoreNextHistoryPop = true;
+      history.back();
+    } else if (!fromHistory) {
+      const entriesToRemove = readerHistoryEntryOpen ? 2 : 1;
+      readerHistoryEntryOpen = false;
+      ignoreNextHistoryPop = true;
+      history.go(-entriesToRemove);
+    }
+  };
+
+  const showReaderSessionSummary = (linesRead, reuseReaderHistoryEntry = false) => {
+    const lineLabel = linesRead === 1 ? 'line' : 'lines';
+    dom.readerSessionSummaryDesc.textContent = `You read ${linesRead} ${lineLabel} this session. Every line counts. ✨`;
+
+    if (reuseReaderHistoryEntry && readerHistoryEntryOpen) {
+      const replacingReaderEntry = history.state?.__lineflowReaderEntry === true;
+      history.replaceState({ ...(history.state || {}), __lineflowReaderSessionSummary: true }, '', window.location.href);
+      if (replacingReaderEntry) readerHistoryEntryOpen = false;
+    } else {
+      history.pushState({ ...(history.state || {}), __lineflowReaderSessionSummary: true }, '', window.location.href);
+    }
+    readerSessionSummaryHistoryEntryOpen = true;
+    dom.readerSessionSummary.classList.remove('hidden');
+    dom.btnCloseReaderSessionSummary.focus();
+  };
+
+  const closeReaderPanel = (fromHistory = false) => {
     document.body.classList.remove('in-reader-mode');
+    pauseTimer();
     const linesRead = getSessionLinesRead();
+    const showSessionSummary = linesRead > 0;
+    const reuseReaderHistoryEntry = showSessionSummary && readerHistoryEntryOpen;
+    if (!showSessionSummary) discardReaderHistoryEntry(fromHistory ? 1 : 2);
     $('#reader-panel').classList.add('hidden');
     $('#control-panel').classList.remove('hidden');
     dom.swipeHint.style.opacity = '1';
     restoreReaderReturnScroll();
-    if (linesRead > 0) {
-      const lineLabel = linesRead === 1 ? 'line' : 'lines';
-      dom.readerSessionSummaryDesc.textContent = `You read ${linesRead} ${lineLabel} this session. Every line counts. ✨`;
-      dom.readerSessionSummary.classList.remove('hidden');
-      dom.btnCloseReaderSessionSummary.focus();
-    }
+    if (showSessionSummary) showReaderSessionSummary(linesRead, reuseReaderHistoryEntry);
   };
 
   const startReadingFromText = (content, documentId = null, startPosition = 0, documentUserId = null) => {
@@ -2656,6 +2702,7 @@
     syncUnderlineModeButton();
     state.currentReadingIntroAlertShown = false;
     state.sessionLinesRead = parsed.length ? 1 : 0;
+    pushReaderHistoryEntry();
     document.body.classList.add('in-reader-mode');
     $('#control-panel').classList.add('hidden');
     $('#reader-panel').classList.remove('hidden');
@@ -3518,7 +3565,7 @@
   dom.btnNext.addEventListener('click', goNext);
   dom.btnOpenReaderNavigation.addEventListener('click', openReaderNavigationModal);
   dom.btnCloseReaderNavigation.addEventListener('click', closeReaderNavigationModal);
-  dom.btnCloseReaderSessionSummary.addEventListener('click', closeReaderSessionSummary);
+  dom.btnCloseReaderSessionSummary.addEventListener('click', () => closeReaderSessionSummary());
   dom.readerSessionSummary.addEventListener('click', event => {
     if (event.target === dom.readerSessionSummary) closeReaderSessionSummary();
   });
@@ -3554,7 +3601,21 @@
   dom.btnFontReset.addEventListener('click', resetReaderFontSize);
   dom.btnFontDecrease.addEventListener('click', decreaseReaderFontSize);
   [dom.btnBack, $('#btn-close')].forEach(el => {
-    el?.addEventListener?.('click', closeReaderPanel);
+    el?.addEventListener?.('click', () => closeReaderPanel());
+  });
+  window.addEventListener('popstate', () => {
+    if (!dom.readerSessionSummary.classList.contains('hidden')) {
+      ignoreNextHistoryPop = false;
+      closeReaderSessionSummary(true);
+      return;
+    }
+    if (ignoreNextHistoryPop) {
+      ignoreNextHistoryPop = false;
+      return;
+    }
+    if (readerHistoryEntryOpen && !$('#reader-panel').classList.contains('hidden')) {
+      closeReaderPanel(true);
+    }
   });
   dom.btnRestart.addEventListener('click', () => {
     if (!state.lines.length) return;
@@ -3566,6 +3627,8 @@
   });
   dom.btnNew.addEventListener('click', () => {
     document.body.classList.remove('in-reader-mode');
+    pauseTimer();
+    discardReaderHistoryEntry();
     $('#reader-panel').classList.add('hidden')
     $('#control-panel').classList.remove('hidden');
     dom.textInput.value = '';
