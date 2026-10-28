@@ -1979,6 +1979,18 @@
   </div>
 </div>
 
+<div id="reader-session-summary" class="lf-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="reader-session-summary-title" aria-describedby="reader-session-summary-desc">
+  <div class="lf-modal-card lf-modal-celebrate">
+    <div class="celebrate-icon" aria-hidden="true">✦</div>
+    <div class="celebrate-badge">READING SESSION</div>
+    <h2 id="reader-session-summary-title" class="celebrate-title">A little progress adds up.</h2>
+    <p id="reader-session-summary-desc" class="celebrate-desc"></p>
+    <div class="celebrate-actions">
+      <button type="button" class="btn-start" id="btn-close-reader-session-summary">Continue</button>
+    </div>
+  </div>
+</div>
+
 <div class="drag-indicator" id="drag-indicator">⬆</div>
 
 <script type="module">
@@ -2087,6 +2099,9 @@
     btnOpenReaderNavigation: $('#btn-open-reader-navigation'),
     readerNavigationModal: $('#reader-navigation-modal'),
     btnCloseReaderNavigation: $('#btn-close-reader-navigation'),
+    readerSessionSummary: $('#reader-session-summary'),
+    readerSessionSummaryDesc: $('#reader-session-summary-desc'),
+    btnCloseReaderSessionSummary: $('#btn-close-reader-session-summary'),
     readerCopyStatus: $('#reader-copy-status'),
     btnRestart: $('#btn-restart'),
     btnNew: $('#btn-new'),
@@ -2602,16 +2617,23 @@
     return state.sessionLinesRead;
   };
 
+  const closeReaderSessionSummary = () => {
+    dom.readerSessionSummary.classList.add('hidden');
+  };
+
   const closeReaderPanel = () => {
     document.body.classList.remove('in-reader-mode');
     const linesRead = getSessionLinesRead();
-    if (linesRead !== 1) {
-      alert(`Congrats you read ${linesRead} lines in this session 🎉`);
-    }
     $('#reader-panel').classList.add('hidden');
     $('#control-panel').classList.remove('hidden');
     dom.swipeHint.style.opacity = '1';
     restoreReaderReturnScroll();
+    if (linesRead > 0) {
+      const lineLabel = linesRead === 1 ? 'line' : 'lines';
+      dom.readerSessionSummaryDesc.textContent = `You read ${linesRead} ${lineLabel} this session. Every line counts. ✨`;
+      dom.readerSessionSummary.classList.remove('hidden');
+      dom.btnCloseReaderSessionSummary.focus();
+    }
   };
 
   const startReadingFromText = (content, documentId = null, startPosition = 0, documentUserId = null) => {
@@ -2896,10 +2918,11 @@
     renderLine(direction);
     persistReadPosition();
 
-    // Resume only when navigation follows an automatic pause caused by leaving the tab.
-    if (timer.pausedForTabSwitch) {
-      timer.pausedForTabSwitch = false;
+    // Reader navigation starts or resumes the focus timer without resetting an active countdown.
+    if (timer.status === 'paused') {
       resumeTimer();
+    } else if (timer.status === 'idle' || timer.status === 'completed') {
+      startTimer(timer.sessionMins || 25);
     }
   };
 
@@ -3495,6 +3518,10 @@
   dom.btnNext.addEventListener('click', goNext);
   dom.btnOpenReaderNavigation.addEventListener('click', openReaderNavigationModal);
   dom.btnCloseReaderNavigation.addEventListener('click', closeReaderNavigationModal);
+  dom.btnCloseReaderSessionSummary.addEventListener('click', closeReaderSessionSummary);
+  dom.readerSessionSummary.addEventListener('click', event => {
+    if (event.target === dom.readerSessionSummary) closeReaderSessionSummary();
+  });
   dom.readerNavigationModal.addEventListener('click', event => {
     if (event.target === dom.readerNavigationModal) closeReaderNavigationModal();
   });
@@ -3663,6 +3690,10 @@
   }, { passive: true });
 
   document.addEventListener('keydown', e => {
+    if (!dom.readerSessionSummary.classList.contains('hidden')) {
+      if (e.key === 'Escape') closeReaderSessionSummary();
+      return;
+    }
     if (dom.readerScreen.classList.contains('hidden')) return;
     if (!dom.readerNavigationModal.classList.contains('hidden')) {
       if (e.key === 'Escape') closeReaderNavigationModal();
@@ -3711,7 +3742,6 @@
     status: 'idle', // 'idle' | 'running' | 'paused' | 'completed'
     targetEndTime: null,
     intervalId: null,
-    pausedForTabSwitch: false,
     selectedPreset: 25,
     customMinutes: 30
   };
@@ -3791,7 +3821,6 @@
         remainingSeconds: timer.remainingSeconds,
         status: timer.status,
         targetEndTime: timer.targetEndTime,
-        pausedForTabSwitch: timer.pausedForTabSwitch,
         selectedPreset: timer.selectedPreset,
         customMinutes: timer.customMinutes
       };
@@ -3907,7 +3936,6 @@
     timer.totalSeconds = Math.round(mins * 60);
     timer.remainingSeconds = timer.totalSeconds;
     timer.status = 'running';
-    timer.pausedForTabSwitch = false;
     timer.targetEndTime = Date.now() + timer.remainingSeconds * 1000;
 
     if (timer.intervalId) clearInterval(timer.intervalId);
@@ -3940,7 +3968,6 @@
   const resumeTimer = () => {
     if (timer.status !== 'paused' || timer.remainingSeconds <= 0) return;
     timer.status = 'running';
-    timer.pausedForTabSwitch = false;
     timer.targetEndTime = Date.now() + timer.remainingSeconds * 1000;
 
     if (timer.intervalId) clearInterval(timer.intervalId);
@@ -3966,7 +3993,6 @@
       timer.intervalId = null;
     }
     timer.targetEndTime = null;
-    timer.pausedForTabSwitch = false;
     if (newMinutes && !isNaN(newMinutes) && Number(newMinutes) > 0) {
       timer.sessionMins = Number(newMinutes);
     }
@@ -4159,7 +4185,6 @@
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && timer.status === 'running') {
-        timer.pausedForTabSwitch = true;
         pauseTimer();
       }
     });
@@ -4306,7 +4331,6 @@
             timer.status = 'paused';
             timer.remainingSeconds = data.remainingSeconds || data.totalSeconds;
             timer.targetEndTime = null;
-            timer.pausedForTabSwitch = data.pausedForTabSwitch === true;
             updateTimerUI();
           } else {
             timer.status = 'idle';
