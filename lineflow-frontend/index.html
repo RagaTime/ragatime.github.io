@@ -552,6 +552,11 @@
     cursor: pointer;
   }
 
+  .reader-shortcut-letter {
+    text-decoration: underline;
+    text-underline-offset: 0.14em;
+  }
+
   #btn-underline-line {
     width: 6rem;
     padding: 0.55rem 0.7rem;
@@ -1804,9 +1809,9 @@
           </div>
         </div>
         <div class="reader-copy-control">
-          <button class="reader-copy-btn" id="btn-underline-line" type="button" aria-label="Underline current line" title="Underline current line" aria-pressed="false" disabled>Underline</button>
-          <button class="reader-copy-btn" id="btn-copy-line" type="button" aria-live="polite" aria-atomic="true">Copy</button>
-          <button class="reader-copy-btn reader-navigate-btn" id="btn-open-reader-navigation" type="button" aria-label="Open navigation controls" title="Open navigation controls">Navigate</button>
+          <button class="reader-copy-btn" id="btn-underline-line" type="button" aria-label="Underline current line" aria-keyshortcuts="U" title="Underline current line (U)" aria-pressed="false" disabled><span class="reader-shortcut-letter">U</span>nderline</button>
+          <button class="reader-copy-btn" id="btn-copy-line" type="button" aria-keyshortcuts="C" title="Copy current line (C)" aria-live="polite" aria-atomic="true"><span class="reader-shortcut-letter">C</span>opy</button>
+          <button class="reader-copy-btn reader-navigate-btn" id="btn-open-reader-navigation" type="button" aria-label="Open navigation controls" aria-keyshortcuts="N" title="Open navigation controls (N)"><span class="reader-shortcut-letter">N</span>avigate</button>
           <span class="reader-copy-status hidden" id="reader-copy-status" role="status" aria-live="polite"></span>
         </div>
         <div class="reading-zone" id="reading-zone">
@@ -2786,10 +2791,10 @@
 
   let copyButtonFeedbackTimeoutId;
   const showCopyButtonFeedback = message => {
-    dom.btnCopyLine.textContent = message;
+    dom.btnCopyLine.innerHTML = `<span class="reader-shortcut-letter">${message[0]}</span>${message.slice(1)}`;
     clearTimeout(copyButtonFeedbackTimeoutId);
     copyButtonFeedbackTimeoutId = setTimeout(() => {
-      dom.btnCopyLine.textContent = 'Copy';
+      dom.btnCopyLine.innerHTML = '<span class="reader-shortcut-letter">C</span>opy';
     }, 1000);
   };
 
@@ -2805,11 +2810,13 @@
     dom.lineText.classList.toggle('is-underlined', isUnderlined);
     dom.btnUnderlineLine.classList.toggle('active', isUnderlined);
     dom.btnUnderlineLine.setAttribute('aria-pressed', String(isUnderlined));
-    dom.btnUnderlineLine.textContent = isUnderlined ? 'Underlined' : 'Underline';
+    dom.btnUnderlineLine.innerHTML = isUnderlined
+      ? '<span class="reader-shortcut-letter">U</span>nderlined'
+      : '<span class="reader-shortcut-letter">U</span>nderline';
     dom.btnUnderlineLine.setAttribute('aria-label', isUnderlined ? 'Remove underline from current line' : 'Underline current line');
     dom.btnUnderlineLine.disabled = !isCurrentReadingDocumentOwned();
     dom.btnUnderlineLine.title = isCurrentReadingDocumentOwned()
-      ? (isUnderlined ? 'Remove underline from current line' : 'Underline current line')
+      ? (isUnderlined ? 'Remove underline from current line (U)' : 'Underline current line (U)')
       : 'Underline is available for your own documents';
   };
 
@@ -3763,6 +3770,23 @@
       return;
     }
     if (e.target instanceof HTMLElement && e.target.matches('input, textarea, select, [contenteditable="true"]')) return;
+    if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+    const shortcut = e.key.toLowerCase();
+    if (shortcut === 'u') {
+      e.preventDefault();
+      toggleCurrentLineUnderline();
+      return;
+    }
+    if (shortcut === 'c') {
+      e.preventDefault();
+      copyCurrentLine();
+      return;
+    }
+    if (shortcut === 'n') {
+      e.preventDefault();
+      openReaderNavigationModal();
+      return;
+    }
     if (['ArrowDown','ArrowRight',' '].includes(e.key)) { e.preventDefault(); goNext(); }
     if (['ArrowUp','ArrowLeft'].includes(e.key)) { e.preventDefault(); goPrev(); }
   });
